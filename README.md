@@ -777,7 +777,7 @@ The library provides several flag enums for more granular control over API reque
 
 | Flag Enum | Description | Values |
 |-----------|-------------|--------|
-| `VpnFlag` | Controls VPN detection | `ENABLED` (1), `DISABLED` (0) |
+| `VpnFlag` | Controls VPN detection | `DISABLED` (0), `ENABLED` (1), `ENHANCED` (2), `ADVANCED` (3) |
 | `AsnFlag` | Controls ASN information | `ENABLED` (1), `DISABLED` (0) |
 | `NodeFlag` | Controls node information | `ENABLED` (1), `DISABLED` (0) |
 | `TimeFlag` | Controls time information | `ENABLED` (1), `DISABLED` (0) |
@@ -785,7 +785,8 @@ The library provides several flag enums for more granular control over API reque
 | `RiskFlag` | Controls risk information | `DISABLED` (0), `ENABLED` (1), `ENHANCED` (2) |
 | `PortFlag` | Controls port information | `ENABLED` (1), `DISABLED` (0) |
 | `SeenFlag` | Controls seen information | `ENABLED` (1), `DISABLED` (0) |
-| `DaysFlag` | Controls days information | `ENABLED` (1), `DISABLED` (0) |
+| `DaysFlag` | Controls days information | Custom numeric value (days) |
+| `TagFlag` | Controls custom tag for query tagging | Custom string value |
 | `VerFlag` | Controls version information | `V1` (1), `V2` (2) |
 
 ### Using Custom Flag Settings
@@ -829,6 +830,23 @@ val options = ProxyCheckOptions.builder()
     .build()
 ```
 
+#### Tag Flag
+
+The `TagFlag` class allows you to set a custom string for query tagging:
+
+```kotlin
+// Set a custom tag for query tagging
+val options = ProxyCheckOptions.builder()
+    .tagFlag(TagFlag.of("my-custom-tag"))
+    .build()
+
+// You can also create a TagFlag directly
+val tagFlag = TagFlag("my-custom-tag")
+val options = ProxyCheckOptions.builder()
+    .tagFlag(tagFlag)
+    .build()
+```
+
 #### Combining Multiple Flags
 
 You can combine multiple flag enums for more comprehensive results:
@@ -841,6 +859,7 @@ val options = ProxyCheckOptions.builder()
     .riskFlag(RiskFlag.ENHANCED)
     .timeFlag(TimeFlag.ENABLED)
     .nodeFlag(NodeFlag.ENABLED)
+    .tagFlag(TagFlag.of("my-custom-tag"))
     .build()
 
 val response = apiClient.checkIp(
