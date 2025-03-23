@@ -4,10 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import io.proxycheck.api.v2.cache.ResponseCache
 import io.proxycheck.api.v2.exceptions.*
-import io.proxycheck.api.v2.models.DashboardResponse
-import io.proxycheck.api.v2.models.EmailCheckResponse
-import io.proxycheck.api.v2.models.ProxyCheckResponse
-import io.proxycheck.api.v2.models.QueryFlag
+import io.proxycheck.api.v2.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Call
@@ -75,50 +72,24 @@ class ProxyCheckApiClient(
      * Checks if the given IP address is a proxy.
      *
      * @param ip The IP address to check.
-     * @param flags The query flags to include in the request.
-     * @param vpnDetection Whether to enable VPN detection.
-     * @param asn Whether to include ASN data in the response.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param port Whether to include the port used by the proxy in the response.
-     * @param seen Whether to include the seen date of the proxy in the response.
-     * @param days Whether to include the days since the proxy was first detected in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return A ProxyCheckResponse object containing the response from the API.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     fun checkIp(
         ip: String,
-        flags: List<QueryFlag> = emptyList(),
-        vpnDetection: Boolean = false,
-        asn: Boolean = false,
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        port: Boolean = false,
-        seen: Boolean = false,
-        days: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true,
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): ProxyCheckResponse {
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Add boolean flags if they are true
-        if (vpnDetection) flagsList.add(QueryFlag.VPN)
-        if (asn) flagsList.add(QueryFlag.ASN)
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
-        if (port) flagsList.add(QueryFlag.PORT)
-        if (seen) flagsList.add(QueryFlag.SEEN)
-        if (days) flagsList.add(QueryFlag.DAYS)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
+        if (options.port) flagsList.add(QueryFlag.PORT)
+        if (options.seen) flagsList.add(QueryFlag.SEEN)
+        if (options.days) flagsList.add(QueryFlag.DAYS)
 
         val url = (baseUrl + ip).toHttpUrl().newBuilder().apply {
             // Add API key if provided
@@ -131,70 +102,112 @@ class ProxyCheckApiClient(
                 addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
             }
 
+            // Add VPN flag with numeric value if provided, otherwise use boolean flag
+            if (options.vpnFlag != null) {
+                addQueryParameter("vpn", options.vpnFlag.value.toString())
+            } else if (options.vpnDetection) {
+                addQueryParameter("vpn", "1")
+            }
+
+            // Add ASN flag with numeric value if provided, otherwise use boolean flag
+            if (options.asnFlag != null) {
+                addQueryParameter("asn", options.asnFlag.value.toString())
+            } else if (options.asn) {
+                addQueryParameter("asn", "1")
+            }
+
+            // Add NODE flag with numeric value if provided, otherwise use boolean flag
+            if (options.nodeFlag != null) {
+                addQueryParameter("node", options.nodeFlag.value.toString())
+            } else if (options.node) {
+                addQueryParameter("node", "1")
+            }
+
+            // Add TIME flag with numeric value if provided, otherwise use boolean flag
+            if (options.timeFlag != null) {
+                addQueryParameter("time", options.timeFlag.value.toString())
+            } else if (options.time) {
+                addQueryParameter("time", "1")
+            }
+
+            // Add INF flag with numeric value if provided, otherwise use boolean flag
+            if (options.infFlag != null) {
+                addQueryParameter("inf", options.infFlag.value.toString())
+            } else if (options.inf) {
+                addQueryParameter("inf", "1")
+            }
+
+            // Add RISK flag with numeric value if provided, otherwise use boolean flag
+            if (options.riskFlag != null) {
+                addQueryParameter("risk", options.riskFlag.value.toString())
+            } else if (options.risk) {
+                addQueryParameter("risk", "1")
+            }
+
+            // Add PORT flag with numeric value if provided, otherwise use boolean flag
+            if (options.portFlag != null) {
+                addQueryParameter("port", options.portFlag.value.toString())
+            } else if (options.port) {
+                addQueryParameter("port", "1")
+            }
+
+            // Add SEEN flag with numeric value if provided, otherwise use boolean flag
+            if (options.seenFlag != null) {
+                addQueryParameter("seen", options.seenFlag.value.toString())
+            } else if (options.seen) {
+                addQueryParameter("seen", "1")
+            }
+
+            // Add DAYS flag with numeric value if provided, otherwise use boolean flag
+            if (options.daysFlag != null) {
+                addQueryParameter("days", options.daysFlag.value.toString())
+            } else if (options.days) {
+                addQueryParameter("days", "1")
+            }
+
             // Add tag if provided
-            if (tag != null) {
-                addQueryParameter("tag", tag)
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
             }
 
             // Add SSL parameter
-            addQueryParameter("ssl", if (useSSL) "1" else "0")
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
         }.build()
 
         val request = Request.Builder()
             .url(url)
             .build()
 
-        return executeRequest(request, cacheTime, cacheTimeUnit)
+        return executeRequest(request, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Checks if the given IP address is a proxy asynchronously.
      *
      * @param ip The IP address to check.
-     * @param flags The query flags to include in the request.
-     * @param vpnDetection Whether to enable VPN detection.
-     * @param asn Whether to include ASN data in the response.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param port Whether to include the port used by the proxy in the response.
-     * @param seen Whether to include the seen date of the proxy in the response.
-     * @param days Whether to include the days since the proxy was first detected in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return A ProxyCheckResponse object containing the response from the API.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     suspend fun checkIpAsync(
         ip: String,
-        flags: List<QueryFlag> = emptyList(),
-        vpnDetection: Boolean = false,
-        asn: Boolean = false,
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        port: Boolean = false,
-        seen: Boolean = false,
-        days: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true,
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): ProxyCheckResponse {
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Add boolean flags if they are true
-        if (vpnDetection) flagsList.add(QueryFlag.VPN)
-        if (asn) flagsList.add(QueryFlag.ASN)
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
-        if (port) flagsList.add(QueryFlag.PORT)
-        if (seen) flagsList.add(QueryFlag.SEEN)
-        if (days) flagsList.add(QueryFlag.DAYS)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
+        if (options.port) flagsList.add(QueryFlag.PORT)
+        if (options.seen) flagsList.add(QueryFlag.SEEN)
+        if (options.days) flagsList.add(QueryFlag.DAYS)
 
         val url = (baseUrl + ip).toHttpUrl().newBuilder().apply {
             // Add API key if provided
@@ -207,74 +220,116 @@ class ProxyCheckApiClient(
                 addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
             }
 
+            // Add VPN flag with numeric value if provided, otherwise use boolean flag
+            if (options.vpnFlag != null) {
+                addQueryParameter("vpn", options.vpnFlag.value.toString())
+            } else if (options.vpnDetection) {
+                addQueryParameter("vpn", "1")
+            }
+
+            // Add ASN flag with numeric value if provided, otherwise use boolean flag
+            if (options.asnFlag != null) {
+                addQueryParameter("asn", options.asnFlag.value.toString())
+            } else if (options.asn) {
+                addQueryParameter("asn", "1")
+            }
+
+            // Add NODE flag with numeric value if provided, otherwise use boolean flag
+            if (options.nodeFlag != null) {
+                addQueryParameter("node", options.nodeFlag.value.toString())
+            } else if (options.node) {
+                addQueryParameter("node", "1")
+            }
+
+            // Add TIME flag with numeric value if provided, otherwise use boolean flag
+            if (options.timeFlag != null) {
+                addQueryParameter("time", options.timeFlag.value.toString())
+            } else if (options.time) {
+                addQueryParameter("time", "1")
+            }
+
+            // Add INF flag with numeric value if provided, otherwise use boolean flag
+            if (options.infFlag != null) {
+                addQueryParameter("inf", options.infFlag.value.toString())
+            } else if (options.inf) {
+                addQueryParameter("inf", "1")
+            }
+
+            // Add RISK flag with numeric value if provided, otherwise use boolean flag
+            if (options.riskFlag != null) {
+                addQueryParameter("risk", options.riskFlag.value.toString())
+            } else if (options.risk) {
+                addQueryParameter("risk", "1")
+            }
+
+            // Add PORT flag with numeric value if provided, otherwise use boolean flag
+            if (options.portFlag != null) {
+                addQueryParameter("port", options.portFlag.value.toString())
+            } else if (options.port) {
+                addQueryParameter("port", "1")
+            }
+
+            // Add SEEN flag with numeric value if provided, otherwise use boolean flag
+            if (options.seenFlag != null) {
+                addQueryParameter("seen", options.seenFlag.value.toString())
+            } else if (options.seen) {
+                addQueryParameter("seen", "1")
+            }
+
+            // Add DAYS flag with numeric value if provided, otherwise use boolean flag
+            if (options.daysFlag != null) {
+                addQueryParameter("days", options.daysFlag.value.toString())
+            } else if (options.days) {
+                addQueryParameter("days", "1")
+            }
+
             // Add tag if provided
-            if (tag != null) {
-                addQueryParameter("tag", tag)
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
             }
 
             // Add SSL parameter
-            addQueryParameter("ssl", if (useSSL) "1" else "0")
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
         }.build()
 
         val request = Request.Builder()
             .url(url)
             .build()
 
-        return executeRequestAsync(request, cacheTime, cacheTimeUnit)
+        return executeRequestAsync(request, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Checks multiple IP addresses in a single request.
      *
      * @param ips The list of IP addresses to check.
-     * @param flags The query flags to include in the request.
-     * @param vpnDetection Whether to enable VPN detection.
-     * @param asn Whether to include ASN data in the response.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param port Whether to include the port used by the proxy in the response.
-     * @param seen Whether to include the seen date of the proxy in the response.
-     * @param days Whether to include the days since the proxy was first detected in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return A map of IP addresses to ProxyCheckResponse objects.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     fun checkIps(
         ips: List<String>,
-        flags: List<QueryFlag> = emptyList(),
-        vpnDetection: Boolean = false,
-        asn: Boolean = false,
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        port: Boolean = false,
-        seen: Boolean = false,
-        days: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true,
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): Map<String, ProxyCheckResponse> {
         if (ips.isEmpty()) {
             return emptyMap()
         }
 
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Add boolean flags if they are true
-        if (vpnDetection) flagsList.add(QueryFlag.VPN)
-        if (asn) flagsList.add(QueryFlag.ASN)
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
-        if (port) flagsList.add(QueryFlag.PORT)
-        if (seen) flagsList.add(QueryFlag.SEEN)
-        if (days) flagsList.add(QueryFlag.DAYS)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
+        if (options.port) flagsList.add(QueryFlag.PORT)
+        if (options.seen) flagsList.add(QueryFlag.SEEN)
+        if (options.days) flagsList.add(QueryFlag.DAYS)
 
         val url = baseUrl.toHttpUrl().newBuilder().apply {
             // Add API key if provided
@@ -287,13 +342,81 @@ class ProxyCheckApiClient(
                 addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
             }
 
+            // Add VPN flag with numeric value if provided, otherwise use boolean flag
+            if (options.vpnFlag != null) {
+                addQueryParameter("vpn", options.vpnFlag.value.toString())
+            } else if (options.vpnDetection) {
+                addQueryParameter("vpn", "1")
+            }
+
+            // Add ASN flag with numeric value if provided, otherwise use boolean flag
+            if (options.asnFlag != null) {
+                addQueryParameter("asn", options.asnFlag.value.toString())
+            } else if (options.asn) {
+                addQueryParameter("asn", "1")
+            }
+
+            // Add NODE flag with numeric value if provided, otherwise use boolean flag
+            if (options.nodeFlag != null) {
+                addQueryParameter("node", options.nodeFlag.value.toString())
+            } else if (options.node) {
+                addQueryParameter("node", "1")
+            }
+
+            // Add TIME flag with numeric value if provided, otherwise use boolean flag
+            if (options.timeFlag != null) {
+                addQueryParameter("time", options.timeFlag.value.toString())
+            } else if (options.time) {
+                addQueryParameter("time", "1")
+            }
+
+            // Add INF flag with numeric value if provided, otherwise use boolean flag
+            if (options.infFlag != null) {
+                addQueryParameter("inf", options.infFlag.value.toString())
+            } else if (options.inf) {
+                addQueryParameter("inf", "1")
+            }
+
+            // Add RISK flag with numeric value if provided, otherwise use boolean flag
+            if (options.riskFlag != null) {
+                addQueryParameter("risk", options.riskFlag.value.toString())
+            } else if (options.risk) {
+                addQueryParameter("risk", "1")
+            }
+
+            // Add PORT flag with numeric value if provided, otherwise use boolean flag
+            if (options.portFlag != null) {
+                addQueryParameter("port", options.portFlag.value.toString())
+            } else if (options.port) {
+                addQueryParameter("port", "1")
+            }
+
+            // Add SEEN flag with numeric value if provided, otherwise use boolean flag
+            if (options.seenFlag != null) {
+                addQueryParameter("seen", options.seenFlag.value.toString())
+            } else if (options.seen) {
+                addQueryParameter("seen", "1")
+            }
+
+            // Add DAYS flag with numeric value if provided, otherwise use boolean flag
+            if (options.daysFlag != null) {
+                addQueryParameter("days", options.daysFlag.value.toString())
+            } else if (options.days) {
+                addQueryParameter("days", "1")
+            }
+
             // Add tag if provided
-            if (tag != null) {
-                addQueryParameter("tag", tag)
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
             }
 
             // Add SSL parameter
-            addQueryParameter("ssl", if (useSSL) "1" else "0")
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
 
             // Add IPs
             addQueryParameter("ips", ips.joinToString(","))
@@ -303,61 +426,35 @@ class ProxyCheckApiClient(
             .url(url)
             .build()
 
-        return executeRequestForMultipleIps(request, ips, cacheTime, cacheTimeUnit)
+        return executeRequestForMultipleIps(request, ips, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Checks multiple IP addresses in a single request asynchronously.
      *
      * @param ips The list of IP addresses to check.
-     * @param flags The query flags to include in the request.
-     * @param vpnDetection Whether to enable VPN detection.
-     * @param asn Whether to include ASN data in the response.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param port Whether to include the port used by the proxy in the response.
-     * @param seen Whether to include the seen date of the proxy in the response.
-     * @param days Whether to include the days since the proxy was first detected in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return A map of IP addresses to ProxyCheckResponse objects.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     suspend fun checkIpsAsync(
         ips: List<String>,
-        flags: List<QueryFlag> = emptyList(),
-        vpnDetection: Boolean = false,
-        asn: Boolean = false,
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        port: Boolean = false,
-        seen: Boolean = false,
-        days: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true,
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): Map<String, ProxyCheckResponse> {
         if (ips.isEmpty()) {
             return emptyMap()
         }
 
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Add boolean flags if they are true
-        if (vpnDetection) flagsList.add(QueryFlag.VPN)
-        if (asn) flagsList.add(QueryFlag.ASN)
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
-        if (port) flagsList.add(QueryFlag.PORT)
-        if (seen) flagsList.add(QueryFlag.SEEN)
-        if (days) flagsList.add(QueryFlag.DAYS)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
+        if (options.port) flagsList.add(QueryFlag.PORT)
+        if (options.seen) flagsList.add(QueryFlag.SEEN)
+        if (options.days) flagsList.add(QueryFlag.DAYS)
 
         val url = baseUrl.toHttpUrl().newBuilder().apply {
             // Add API key if provided
@@ -370,13 +467,81 @@ class ProxyCheckApiClient(
                 addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
             }
 
+            // Add VPN flag with numeric value if provided, otherwise use boolean flag
+            if (options.vpnFlag != null) {
+                addQueryParameter("vpn", options.vpnFlag.value.toString())
+            } else if (options.vpnDetection) {
+                addQueryParameter("vpn", "1")
+            }
+
+            // Add ASN flag with numeric value if provided, otherwise use boolean flag
+            if (options.asnFlag != null) {
+                addQueryParameter("asn", options.asnFlag.value.toString())
+            } else if (options.asn) {
+                addQueryParameter("asn", "1")
+            }
+
+            // Add NODE flag with numeric value if provided, otherwise use boolean flag
+            if (options.nodeFlag != null) {
+                addQueryParameter("node", options.nodeFlag.value.toString())
+            } else if (options.node) {
+                addQueryParameter("node", "1")
+            }
+
+            // Add TIME flag with numeric value if provided, otherwise use boolean flag
+            if (options.timeFlag != null) {
+                addQueryParameter("time", options.timeFlag.value.toString())
+            } else if (options.time) {
+                addQueryParameter("time", "1")
+            }
+
+            // Add INF flag with numeric value if provided, otherwise use boolean flag
+            if (options.infFlag != null) {
+                addQueryParameter("inf", options.infFlag.value.toString())
+            } else if (options.inf) {
+                addQueryParameter("inf", "1")
+            }
+
+            // Add RISK flag with numeric value if provided, otherwise use boolean flag
+            if (options.riskFlag != null) {
+                addQueryParameter("risk", options.riskFlag.value.toString())
+            } else if (options.risk) {
+                addQueryParameter("risk", "1")
+            }
+
+            // Add PORT flag with numeric value if provided, otherwise use boolean flag
+            if (options.portFlag != null) {
+                addQueryParameter("port", options.portFlag.value.toString())
+            } else if (options.port) {
+                addQueryParameter("port", "1")
+            }
+
+            // Add SEEN flag with numeric value if provided, otherwise use boolean flag
+            if (options.seenFlag != null) {
+                addQueryParameter("seen", options.seenFlag.value.toString())
+            } else if (options.seen) {
+                addQueryParameter("seen", "1")
+            }
+
+            // Add DAYS flag with numeric value if provided, otherwise use boolean flag
+            if (options.daysFlag != null) {
+                addQueryParameter("days", options.daysFlag.value.toString())
+            } else if (options.days) {
+                addQueryParameter("days", "1")
+            }
+
             // Add tag if provided
-            if (tag != null) {
-                addQueryParameter("tag", tag)
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
             }
 
             // Add SSL parameter
-            addQueryParameter("ssl", if (useSSL) "1" else "0")
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
 
             // Add IPs
             addQueryParameter("ips", ips.joinToString(","))
@@ -386,21 +551,19 @@ class ProxyCheckApiClient(
             .url(url)
             .build()
 
-        return executeRequestForMultipleIpsAsync(request, ips, cacheTime, cacheTimeUnit)
+        return executeRequestForMultipleIpsAsync(request, ips, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Gets the dashboard information for the account.
      *
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return A DashboardResponse object containing the dashboard information.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     fun getDashboard(
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): DashboardResponse {
         if (apiKey == null) {
             throw ApiKeyException("API key is required for dashboard requests")
@@ -408,27 +571,38 @@ class ProxyCheckApiClient(
 
         val url = (baseUrl + "dashboard").toHttpUrl().newBuilder().apply {
             addQueryParameter("key", apiKey)
+
+            // Add tag if provided
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
+            }
+
+            // Add SSL parameter
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
         }.build()
 
         val request = Request.Builder()
             .url(url)
             .build()
 
-        return executeDashboardRequest(request, cacheTime, cacheTimeUnit)
+        return executeDashboardRequest(request, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Gets the dashboard information for the account asynchronously.
      *
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return A DashboardResponse object containing the dashboard information.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     suspend fun getDashboardAsync(
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): DashboardResponse {
         if (apiKey == null) {
             throw ApiKeyException("API key is required for dashboard requests")
@@ -436,43 +610,42 @@ class ProxyCheckApiClient(
 
         val url = (baseUrl + "dashboard").toHttpUrl().newBuilder().apply {
             addQueryParameter("key", apiKey)
+
+            // Add tag if provided
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
+            }
+
+            // Add SSL parameter
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
         }.build()
 
         val request = Request.Builder()
             .url(url)
             .build()
 
-        return executeDashboardRequestAsync(request, cacheTime, cacheTimeUnit)
+        return executeDashboardRequestAsync(request, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Checks if the given email address is from a disposable email provider.
      *
      * @param email The email address to check.
-     * @param flags The query flags to include in the request.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return An EmailCheckResponse object containing the response from the API.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     fun checkEmail(
         email: String,
-        flags: List<QueryFlag> = listOf(QueryFlag.MAIL),
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true,
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions(flags = listOf(QueryFlag.MAIL))
     ): EmailCheckResponse {
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Make sure the MAIL flag is included
         if (!flagsList.contains(QueryFlag.MAIL)) {
@@ -480,9 +653,9 @@ class ProxyCheckApiClient(
         }
 
         // Add boolean flags if they are true
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
 
         val url = (baseUrl + email).toHttpUrl().newBuilder().apply {
             // Add API key if provided
@@ -495,50 +668,62 @@ class ProxyCheckApiClient(
                 addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
             }
 
+            // Add NODE flag with numeric value if provided, otherwise use boolean flag
+            if (options.nodeFlag != null) {
+                addQueryParameter("node", options.nodeFlag.value.toString())
+            } else if (options.node) {
+                addQueryParameter("node", "1")
+            }
+
+            // Add TIME flag with numeric value if provided, otherwise use boolean flag
+            if (options.timeFlag != null) {
+                addQueryParameter("time", options.timeFlag.value.toString())
+            } else if (options.time) {
+                addQueryParameter("time", "1")
+            }
+
+            // Add RISK flag with numeric value if provided, otherwise use boolean flag
+            if (options.riskFlag != null) {
+                addQueryParameter("risk", options.riskFlag.value.toString())
+            } else if (options.risk) {
+                addQueryParameter("risk", "1")
+            }
+
             // Add tag if provided
-            if (tag != null) {
-                addQueryParameter("tag", tag)
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
             }
 
             // Add SSL parameter
-            addQueryParameter("ssl", if (useSSL) "1" else "0")
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
         }.build()
 
         val request = Request.Builder()
             .url(url)
             .build()
 
-        return executeEmailRequest(request, cacheTime, cacheTimeUnit)
+        return executeEmailRequest(request, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**
      * Checks if the given email address is from a disposable email provider asynchronously.
      *
      * @param email The email address to check.
-     * @param flags The query flags to include in the request.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
-     * @param cacheTime The time to cache the response, or null to use the default.
-     * @param cacheTimeUnit The time unit for cacheTime, or null to use the default.
+     * @param options Optional parameters for the request.
      * @return An EmailCheckResponse object containing the response from the API.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     suspend fun checkEmailAsync(
         email: String,
-        flags: List<QueryFlag> = listOf(QueryFlag.MAIL),
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true,
-        cacheTime: Long? = null,
-        cacheTimeUnit: TimeUnit? = null
+        options: ProxyCheckOptions = ProxyCheckOptions(flags = listOf(QueryFlag.MAIL))
     ): EmailCheckResponse {
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Make sure the MAIL flag is included
         if (!flagsList.contains(QueryFlag.MAIL)) {
@@ -546,9 +731,9 @@ class ProxyCheckApiClient(
         }
 
         // Add boolean flags if they are true
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
 
         val url = (baseUrl + email).toHttpUrl().newBuilder().apply {
             // Add API key if provided
@@ -561,20 +746,46 @@ class ProxyCheckApiClient(
                 addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
             }
 
+            // Add NODE flag with numeric value if provided, otherwise use boolean flag
+            if (options.nodeFlag != null) {
+                addQueryParameter("node", options.nodeFlag.value.toString())
+            } else if (options.node) {
+                addQueryParameter("node", "1")
+            }
+
+            // Add TIME flag with numeric value if provided, otherwise use boolean flag
+            if (options.timeFlag != null) {
+                addQueryParameter("time", options.timeFlag.value.toString())
+            } else if (options.time) {
+                addQueryParameter("time", "1")
+            }
+
+            // Add RISK flag with numeric value if provided, otherwise use boolean flag
+            if (options.riskFlag != null) {
+                addQueryParameter("risk", options.riskFlag.value.toString())
+            } else if (options.risk) {
+                addQueryParameter("risk", "1")
+            }
+
             // Add tag if provided
-            if (tag != null) {
-                addQueryParameter("tag", tag)
+            if (options.tag != null) {
+                addQueryParameter("tag", options.tag)
+            }
+
+            // Add VER flag with date value if provided
+            if (options.verFlag != null) {
+                addQueryParameter("ver", options.verFlag.value)
             }
 
             // Add SSL parameter
-            addQueryParameter("ssl", if (useSSL) "1" else "0")
+            addQueryParameter("ssl", if (options.useSSL) "1" else "0")
         }.build()
 
         val request = Request.Builder()
             .url(url)
             .build()
 
-        return executeEmailRequestAsync(request, cacheTime, cacheTimeUnit)
+        return executeEmailRequestAsync(request, options.cacheTime, options.cacheTimeUnit)
     }
 
     /**

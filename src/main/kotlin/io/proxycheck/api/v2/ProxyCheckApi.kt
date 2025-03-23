@@ -5,9 +5,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.JsonParser.parseString
 import io.proxycheck.api.v2.exceptions.*
-import io.proxycheck.api.v2.models.DashboardResponse
-import io.proxycheck.api.v2.models.ProxyCheckResponse
-import io.proxycheck.api.v2.models.QueryFlag
+import io.proxycheck.api.v2.models.*
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -37,46 +35,24 @@ class ProxyCheckApi(
      * Checks if the given IP address is a proxy.
      *
      * @param ip The IP address to check.
-     * @param flags The query flags to include in the request.
-     * @param vpnDetection Whether to enable VPN detection.
-     * @param asn Whether to include ASN data in the response.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param port Whether to include the port used by the proxy in the response.
-     * @param seen Whether to include the seen date of the proxy in the response.
-     * @param days Whether to include the days since the proxy was first detected in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
+     * @param options Optional parameters for the request.
      * @return A ProxyCheckResponse object containing the response from the API.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     fun checkIp(
         ip: String,
-        flags: List<QueryFlag> = emptyList(),
-        vpnDetection: Boolean = false,
-        asn: Boolean = false,
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        port: Boolean = false,
-        seen: Boolean = false,
-        days: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): ProxyCheckResponse {
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Add boolean flags if they are true
-        if (vpnDetection) flagsList.add(QueryFlag.VPN)
-        if (asn) flagsList.add(QueryFlag.ASN)
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
-        if (port) flagsList.add(QueryFlag.PORT)
-        if (seen) flagsList.add(QueryFlag.SEEN)
-        if (days) flagsList.add(QueryFlag.DAYS)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
+        if (options.port) flagsList.add(QueryFlag.PORT)
+        if (options.seen) flagsList.add(QueryFlag.SEEN)
+        if (options.days) flagsList.add(QueryFlag.DAYS)
 
         val urlBuilder = HttpUrl.Builder()
             .scheme("https")
@@ -96,13 +72,81 @@ class ProxyCheckApi(
             urlBuilder.addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
         }
 
+        // Add VPN flag with numeric value if provided, otherwise use boolean flag
+        if (options.vpnFlag != null) {
+            urlBuilder.addQueryParameter("vpn", options.vpnFlag.value.toString())
+        } else if (options.vpnDetection) {
+            urlBuilder.addQueryParameter("vpn", "1")
+        }
+
+        // Add ASN flag with numeric value if provided, otherwise use boolean flag
+        if (options.asnFlag != null) {
+            urlBuilder.addQueryParameter("asn", options.asnFlag.value.toString())
+        } else if (options.asn) {
+            urlBuilder.addQueryParameter("asn", "1")
+        }
+
+        // Add NODE flag with numeric value if provided, otherwise use boolean flag
+        if (options.nodeFlag != null) {
+            urlBuilder.addQueryParameter("node", options.nodeFlag.value.toString())
+        } else if (options.node) {
+            urlBuilder.addQueryParameter("node", "1")
+        }
+
+        // Add TIME flag with numeric value if provided, otherwise use boolean flag
+        if (options.timeFlag != null) {
+            urlBuilder.addQueryParameter("time", options.timeFlag.value.toString())
+        } else if (options.time) {
+            urlBuilder.addQueryParameter("time", "1")
+        }
+
+        // Add INF flag with numeric value if provided, otherwise use boolean flag
+        if (options.infFlag != null) {
+            urlBuilder.addQueryParameter("inf", options.infFlag.value.toString())
+        } else if (options.inf) {
+            urlBuilder.addQueryParameter("inf", "1")
+        }
+
+        // Add RISK flag with numeric value if provided, otherwise use boolean flag
+        if (options.riskFlag != null) {
+            urlBuilder.addQueryParameter("risk", options.riskFlag.value.toString())
+        } else if (options.risk) {
+            urlBuilder.addQueryParameter("risk", "1")
+        }
+
+        // Add PORT flag with numeric value if provided, otherwise use boolean flag
+        if (options.portFlag != null) {
+            urlBuilder.addQueryParameter("port", options.portFlag.value.toString())
+        } else if (options.port) {
+            urlBuilder.addQueryParameter("port", "1")
+        }
+
+        // Add SEEN flag with numeric value if provided, otherwise use boolean flag
+        if (options.seenFlag != null) {
+            urlBuilder.addQueryParameter("seen", options.seenFlag.value.toString())
+        } else if (options.seen) {
+            urlBuilder.addQueryParameter("seen", "1")
+        }
+
+        // Add DAYS flag with numeric value if provided, otherwise use boolean flag
+        if (options.daysFlag != null) {
+            urlBuilder.addQueryParameter("days", options.daysFlag.value.toString())
+        } else if (options.days) {
+            urlBuilder.addQueryParameter("days", "1")
+        }
+
         // Add tag if provided
-        if (tag != null) {
-            urlBuilder.addQueryParameter("tag", tag)
+        if (options.tag != null) {
+            urlBuilder.addQueryParameter("tag", options.tag)
+        }
+
+        // Add VER flag with date value if provided
+        if (options.verFlag != null) {
+            urlBuilder.addQueryParameter("ver", options.verFlag.value)
         }
 
         // Add SSL parameter
-        urlBuilder.addQueryParameter("ssl", if (useSSL) "1" else "0")
+        urlBuilder.addQueryParameter("ssl", if (options.useSSL) "1" else "0")
 
         val request = Request.Builder()
             .url(urlBuilder.build())
@@ -115,50 +159,28 @@ class ProxyCheckApi(
      * Checks multiple IP addresses in a single request.
      *
      * @param ips The list of IP addresses to check.
-     * @param flags The query flags to include in the request.
-     * @param vpnDetection Whether to enable VPN detection.
-     * @param asn Whether to include ASN data in the response.
-     * @param node Whether to include the node that processed the request in the response.
-     * @param time Whether to include the time it took to process the request in the response.
-     * @param risk Whether to include the risk score in the response.
-     * @param port Whether to include the port used by the proxy in the response.
-     * @param seen Whether to include the seen date of the proxy in the response.
-     * @param days Whether to include the days since the proxy was first detected in the response.
-     * @param tag A custom tag to identify the request.
-     * @param useSSL Whether to use SSL for the request.
+     * @param options Optional parameters for the request.
      * @return A map of IP addresses to ProxyCheckResponse objects.
      * @throws ProxyCheckException If there is an error with the API request.
      */
     @JvmOverloads
     fun checkIps(
         ips: List<String>,
-        flags: List<QueryFlag> = emptyList(),
-        vpnDetection: Boolean = false,
-        asn: Boolean = false,
-        node: Boolean = false,
-        time: Boolean = false,
-        risk: Boolean = false,
-        port: Boolean = false,
-        seen: Boolean = false,
-        days: Boolean = false,
-        tag: String? = null,
-        useSSL: Boolean = true
+        options: ProxyCheckOptions = ProxyCheckOptions()
     ): Map<String, ProxyCheckResponse> {
         if (ips.isEmpty()) {
             return emptyMap()
         }
 
-        val flagsList = flags.toMutableList()
+        val flagsList = options.flags.toMutableList()
 
         // Add boolean flags if they are true
-        if (vpnDetection) flagsList.add(QueryFlag.VPN)
-        if (asn) flagsList.add(QueryFlag.ASN)
-        if (node) flagsList.add(QueryFlag.NODE)
-        if (time) flagsList.add(QueryFlag.TIME)
-        if (risk) flagsList.add(QueryFlag.RISK)
-        if (port) flagsList.add(QueryFlag.PORT)
-        if (seen) flagsList.add(QueryFlag.SEEN)
-        if (days) flagsList.add(QueryFlag.DAYS)
+        if (options.node) flagsList.add(QueryFlag.NODE)
+        if (options.time) flagsList.add(QueryFlag.TIME)
+        if (options.risk) flagsList.add(QueryFlag.RISK)
+        if (options.port) flagsList.add(QueryFlag.PORT)
+        if (options.seen) flagsList.add(QueryFlag.SEEN)
+        if (options.days) flagsList.add(QueryFlag.DAYS)
 
         val urlBuilder = baseUrl.toHttpUrl().newBuilder()
 
@@ -172,13 +194,81 @@ class ProxyCheckApi(
             urlBuilder.addQueryParameter("flags", QueryFlag.toQueryString(flagsList))
         }
 
+        // Add VPN flag with numeric value if provided, otherwise use boolean flag
+        if (options.vpnFlag != null) {
+            urlBuilder.addQueryParameter("vpn", options.vpnFlag.value.toString())
+        } else if (options.vpnDetection) {
+            urlBuilder.addQueryParameter("vpn", "1")
+        }
+
+        // Add ASN flag with numeric value if provided, otherwise use boolean flag
+        if (options.asnFlag != null) {
+            urlBuilder.addQueryParameter("asn", options.asnFlag.value.toString())
+        } else if (options.asn) {
+            urlBuilder.addQueryParameter("asn", "1")
+        }
+
+        // Add NODE flag with numeric value if provided, otherwise use boolean flag
+        if (options.nodeFlag != null) {
+            urlBuilder.addQueryParameter("node", options.nodeFlag.value.toString())
+        } else if (options.node) {
+            urlBuilder.addQueryParameter("node", "1")
+        }
+
+        // Add TIME flag with numeric value if provided, otherwise use boolean flag
+        if (options.timeFlag != null) {
+            urlBuilder.addQueryParameter("time", options.timeFlag.value.toString())
+        } else if (options.time) {
+            urlBuilder.addQueryParameter("time", "1")
+        }
+
+        // Add INF flag with numeric value if provided, otherwise use boolean flag
+        if (options.infFlag != null) {
+            urlBuilder.addQueryParameter("inf", options.infFlag.value.toString())
+        } else if (options.inf) {
+            urlBuilder.addQueryParameter("inf", "1")
+        }
+
+        // Add RISK flag with numeric value if provided, otherwise use boolean flag
+        if (options.riskFlag != null) {
+            urlBuilder.addQueryParameter("risk", options.riskFlag.value.toString())
+        } else if (options.risk) {
+            urlBuilder.addQueryParameter("risk", "1")
+        }
+
+        // Add PORT flag with numeric value if provided, otherwise use boolean flag
+        if (options.portFlag != null) {
+            urlBuilder.addQueryParameter("port", options.portFlag.value.toString())
+        } else if (options.port) {
+            urlBuilder.addQueryParameter("port", "1")
+        }
+
+        // Add SEEN flag with numeric value if provided, otherwise use boolean flag
+        if (options.seenFlag != null) {
+            urlBuilder.addQueryParameter("seen", options.seenFlag.value.toString())
+        } else if (options.seen) {
+            urlBuilder.addQueryParameter("seen", "1")
+        }
+
+        // Add DAYS flag with numeric value if provided, otherwise use boolean flag
+        if (options.daysFlag != null) {
+            urlBuilder.addQueryParameter("days", options.daysFlag.value.toString())
+        } else if (options.days) {
+            urlBuilder.addQueryParameter("days", "1")
+        }
+
         // Add tag if provided
-        if (tag != null) {
-            urlBuilder.addQueryParameter("tag", tag)
+        if (options.tag != null) {
+            urlBuilder.addQueryParameter("tag", options.tag)
+        }
+
+        // Add VER flag with date value if provided
+        if (options.verFlag != null) {
+            urlBuilder.addQueryParameter("ver", options.verFlag.value)
         }
 
         // Add SSL parameter
-        urlBuilder.addQueryParameter("ssl", if (useSSL) "1" else "0")
+        urlBuilder.addQueryParameter("ssl", if (options.useSSL) "1" else "0")
 
         // Add IPs
         urlBuilder.addQueryParameter("ips", ips.joinToString(","))
@@ -193,16 +283,33 @@ class ProxyCheckApi(
     /**
      * Gets the dashboard information for the account.
      *
+     * @param options Optional parameters for the request.
      * @return A DashboardResponse object containing the dashboard information.
      * @throws ProxyCheckException If there is an error with the API request.
      */
-    fun getDashboard(): DashboardResponse {
+    @JvmOverloads
+    fun getDashboard(
+        options: ProxyCheckOptions = ProxyCheckOptions()
+    ): DashboardResponse {
         if (apiKey == null) {
             throw ApiKeyException("API key is required for dashboard requests")
         }
 
         val urlBuilder = (baseUrl + "dashboard").toHttpUrl().newBuilder()
         urlBuilder.addQueryParameter("key", apiKey)
+
+        // Add tag if provided
+        if (options.tag != null) {
+            urlBuilder.addQueryParameter("tag", options.tag)
+        }
+
+        // Add VER flag with date value if provided
+        if (options.verFlag != null) {
+            urlBuilder.addQueryParameter("ver", options.verFlag.value)
+        }
+
+        // Add SSL parameter
+        urlBuilder.addQueryParameter("ssl", if (options.useSSL) "1" else "0")
 
         val request = Request.Builder()
             .url(urlBuilder.build())

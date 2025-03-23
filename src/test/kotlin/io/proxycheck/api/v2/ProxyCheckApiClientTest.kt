@@ -2,9 +2,7 @@ package io.proxycheck.api.v2
 
 import io.proxycheck.api.v2.exceptions.ApiKeyException
 import io.proxycheck.api.v2.exceptions.RateLimitException
-import io.proxycheck.api.v2.models.ProxyCheckResponse
-import io.proxycheck.api.v2.models.QueryFlag
-import io.proxycheck.api.v2.models.ResponseStatus
+import io.proxycheck.api.v2.models.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -174,9 +172,12 @@ class ProxyCheckApiClientTest {
         whenever(mockResponseBody.string()).thenReturn(jsonResponse)
 
         // Act
+        val options = ProxyCheckOptions.builder()
+            .flags(listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME))
+            .build()
         val response = apiClient.checkIp(
             ip = "8.8.8.8",
-            flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+            options = options
         )
 
         // Assert
@@ -186,5 +187,246 @@ class ProxyCheckApiClientTest {
         assertEquals("no", response.proxyString)
         assertEquals(15169, response.asn)
         assertEquals(0.01, response.timeDouble)
+    }
+
+    @Test
+    fun `checkIp should include VPN flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false,
+                "asn": 15169,
+                "time": 0.01
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val options = ProxyCheckOptions.builder()
+            .vpnFlag(VpnFlag.ENABLED) // Value 1
+            .build()
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            options = options
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+        assertEquals(15169, response.asn)
+    }
+
+    @Test
+    fun `checkIp should include ASN flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false,
+                "asn": 15169,
+                "time": 0.01
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val options = ProxyCheckOptions.builder()
+            .asnFlag(AsnFlag.ENABLED) // Value 1
+            .build()
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            options = options
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+        assertEquals(15169, response.asn)
+    }
+
+    @Test
+    fun `checkIp should include NODE flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false,
+                "node": "test-node",
+                "time": 0.01
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val options = ProxyCheckOptions.builder()
+            .nodeFlag(NodeFlag.ENABLED) // Value 1
+            .build()
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            options = options
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+        assertEquals("test-node", response.node)
+    }
+
+    @Test
+    fun `checkIp should include TIME flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false,
+                "time": 0.01
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val options = ProxyCheckOptions.builder()
+            .timeFlag(TimeFlag.ENABLED) // Value 1
+            .build()
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            options = options
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+        assertEquals(0.01, response.timeDouble)
+    }
+
+    @Test
+    fun `checkIp should include INF flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            infFlag = InfFlag.ENABLED // Value 1
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+    }
+
+    @Test
+    fun `checkIp should include RISK flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false,
+                "risk": 0
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            riskFlag = RiskFlag.ENHANCED // Value 2
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+        assertEquals(0, response.risk)
+    }
+
+    @Test
+    fun `checkIp should include PORT flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            portFlag = PortFlag.ENABLED // Value 1
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+    }
+
+    @Test
+    fun `checkIp should include SEEN flag with numeric value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            seenFlag = SeenFlag.ENABLED // Value 1
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
     }
 }

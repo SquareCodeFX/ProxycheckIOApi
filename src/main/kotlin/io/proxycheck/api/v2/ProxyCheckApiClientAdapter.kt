@@ -1,10 +1,7 @@
 package io.proxycheck.api.v2
 
 import com.google.gson.Gson
-import io.proxycheck.api.v2.models.DashboardResponse
-import io.proxycheck.api.v2.models.EmailCheckResponse
-import io.proxycheck.api.v2.models.ProxyCheckResponse
-import io.proxycheck.api.v2.models.QueryFlag
+import io.proxycheck.api.v2.models.*
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -31,21 +28,9 @@ class ProxyCheckApiClientAdapter(
      */
     override fun checkIp(
         ip: String,
-        flags: List<QueryFlag>,
-        vpnDetection: Boolean,
-        asn: Boolean,
-        node: Boolean,
-        time: Boolean,
-        risk: Boolean,
-        port: Boolean,
-        seen: Boolean,
-        days: Boolean,
-        tag: String?,
-        useSSL: Boolean
+        options: ProxyCheckOptions
     ): ProxyCheckResponse {
-        return apiClient.checkIp(
-            ip, flags, vpnDetection, asn, node, time, risk, port, seen, days, tag, useSSL
-        )
+        return apiClient.checkIp(ip, options)
     }
 
     /**
@@ -54,29 +39,19 @@ class ProxyCheckApiClientAdapter(
      */
     override fun checkIps(
         ips: List<String>,
-        flags: List<QueryFlag>,
-        vpnDetection: Boolean,
-        asn: Boolean,
-        node: Boolean,
-        time: Boolean,
-        risk: Boolean,
-        port: Boolean,
-        seen: Boolean,
-        days: Boolean,
-        tag: String?,
-        useSSL: Boolean
+        options: ProxyCheckOptions
     ): Map<String, ProxyCheckResponse> {
-        return apiClient.checkIps(
-            ips, flags, vpnDetection, asn, node, time, risk, port, seen, days, tag, useSSL
-        )
+        return apiClient.checkIps(ips, options)
     }
 
     /**
      * Gets the dashboard information for the account.
      * Delegates to ProxyCheckApiClient.getDashboard.
      */
-    override fun getDashboard(): DashboardResponse {
-        return apiClient.getDashboard()
+    override fun getDashboard(
+        options: ProxyCheckOptions
+    ): DashboardResponse {
+        return apiClient.getDashboard(options)
     }
 
     /**
@@ -85,15 +60,8 @@ class ProxyCheckApiClientAdapter(
      */
     override fun checkEmail(
         email: String,
-        flags: List<QueryFlag>,
-        node: Boolean,
-        time: Boolean,
-        risk: Boolean,
-        tag: String?,
-        useSSL: Boolean
+        options: ProxyCheckOptions
     ): EmailCheckResponse {
-        return apiClient.checkEmail(
-            email, flags, node, time, risk, tag, useSSL
-        )
+        return apiClient.checkEmail(email, options)
     }
 }
