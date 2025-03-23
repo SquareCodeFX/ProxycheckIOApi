@@ -2,6 +2,27 @@
 
 A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API v2. This library provides a simple and easy-to-use interface for checking if an IP address is a proxy, VPN, or TOR exit node, as well as validating email addresses.
 
+[![JitPack](https://jitpack.io/v/org.example/proxycheck-api.svg)](https://jitpack.io/#org.example/proxycheck-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg)](https://kotlinlang.org)
+[![Java](https://img.shields.io/badge/java-8%2B-blue.svg)](https://www.oracle.com/java/)
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Repository](#repository)
+- [Dependencies](#dependencies)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Query Flags](#query-flags)
+- [Exceptions](#exceptions)
+- [Rate Limits](#rate-limits)
+- [Version Compatibility](#version-compatibility)
+- [Tests](#tests)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - Check if an IP address is a proxy, VPN, or TOR exit node
@@ -34,6 +55,49 @@ dependencies {
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
+
+## Repository
+
+This library is available through JitPack. To use it, add the JitPack repository to your build file:
+
+### Gradle
+
+```kotlin
+repositories {
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+}
+```
+
+### Maven
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+
+## Dependencies
+
+This library depends on the following libraries:
+
+| Dependency | Version | Description |
+|------------|---------|-------------|
+| Kotlin Standard Library | 1.9.0 | Kotlin standard library |
+| OkHttp | 4.11.0 | HTTP client for making API requests |
+| Gson | 2.10.1 | JSON parsing library |
+| Kotlin Coroutines | 1.7.3 | For asynchronous programming |
+
+For testing, the following dependencies are used:
+
+| Dependency | Version | Description |
+|------------|---------|-------------|
+| JUnit | 5.10.0 | Testing framework |
+| Mockito | 5.4.0 | Mocking framework |
+| Mockito Kotlin | 5.0.0 | Kotlin extensions for Mockito |
 
 ## Usage
 
@@ -368,6 +432,17 @@ try {
 }
 ```
 
+## API Endpoints
+
+This library provides access to the following ProxyCheck.io API endpoints:
+
+| Endpoint | Description | Method |
+|----------|-------------|--------|
+| `https://proxycheck.io/v2/{ip}` | Check if an IP address is a proxy | `checkIp()`, `checkIpAsync()` |
+| `https://proxycheck.io/v2/` | Check multiple IP addresses | `checkIps()`, `checkIpsAsync()` |
+| `https://proxycheck.io/v2/dashboard` | Get account information | `getDashboard()`, `getDashboardAsync()` |
+| `https://proxycheck.io/v2/{email}` | Check if an email is from a disposable provider | `checkEmail()`, `checkEmailAsync()` |
+
 ## Query Flags
 
 The following query flags are supported:
@@ -395,14 +470,106 @@ The following query flags are supported:
 - `ISP`: Returns the ISP of the IP address
 - `MAIL`: Enables email checking for disposable email providers
 
-## Dependencies
+## Exceptions
 
-This library depends on the following libraries:
+This library provides a comprehensive set of exceptions to handle various error scenarios:
 
-- Kotlin Standard Library
-- OkHttp (version 4.11.0) for HTTP client functionality
-- Gson (version 2.10.1) for JSON parsing
-- Kotlin Coroutines (version 1.7.3) for asynchronous programming
+| Exception | Description |
+|-----------|-------------|
+| `ProxyCheckException` | Base exception class for all ProxyCheck.io API exceptions |
+| `ApiKeyException` | Thrown when the API key is invalid or missing |
+| `RateLimitException` | Thrown when the API rate limit is exceeded |
+| `InvalidRequestException` | Thrown when the API request is invalid |
+| `ApiErrorException` | Thrown when the API returns an error |
+| `ApiWarningException` | Thrown when the API returns a warning |
+| `ApiDeniedException` | Thrown when the API denies the request |
+| `PlanLimitException` | Thrown when the plan limits are exceeded, with additional properties for plan information |
+| `NetworkException` | Thrown when there is a network error |
+
+Example of handling exceptions:
+
+```kotlin
+try {
+    val response = client.checkIp("8.8.8.8")
+    // Process response
+} catch (e: ApiKeyException) {
+    // Handle API key errors
+    println("API key error: ${e.message}")
+} catch (e: RateLimitException) {
+    // Handle rate limit errors
+    println("Rate limit exceeded: ${e.message}")
+} catch (e: PlanLimitException) {
+    // Handle plan limit errors
+    println("Plan limit exceeded: ${e.message}")
+    println("Plan: ${e.plan}")
+    println("Queries Today: ${e.queriesToday}")
+    println("Max Queries Day: ${e.maxQueriesDay}")
+} catch (e: ProxyCheckException) {
+    // Handle all other ProxyCheck.io API errors
+    println("ProxyCheck.io API error: ${e.message}")
+}
+```
+
+## Rate Limits
+
+ProxyCheck.io imposes rate limits on API requests based on your plan. This library handles rate limit errors by throwing a `RateLimitException` when the rate limit is exceeded.
+
+- Free plan: 100 queries per day
+- Paid plans: Various limits based on the plan
+
+When you exceed your plan's query limit, a `PlanLimitException` is thrown with details about your current usage:
+
+- `plan`: Your current plan
+- `queriesToday`: Number of queries used today
+- `queriesMonth`: Number of queries used this month
+- `maxQueriesDay`: Maximum number of queries allowed per day
+- `maxQueriesMonth`: Maximum number of queries allowed per month
+- `daysUntilReset`: Number of days until the query count resets
+
+To avoid rate limit errors, you can:
+
+1. Use the built-in caching functionality to reduce the number of API requests
+2. Implement your own caching mechanism
+3. Upgrade to a higher plan with higher rate limits
+
+## Version Compatibility
+
+This library is compatible with:
+
+- Java 8 or higher
+- Kotlin 1.7 or higher
+- Android API level 21 (Android 5.0 Lollipop) or higher
+
+The library targets ProxyCheck.io API v2 and is built with:
+
+- Kotlin 1.9.0
+- OkHttp 4.11.0
+- Gson 2.10.1
+- Kotlin Coroutines 1.7.3
+
+## Tests
+
+Currently, there are no tests in the project. Here are some suggested tests to add:
+
+1. Unit tests for the `ProxyCheckApiClient` class
+   - Test successful IP check
+   - Test successful multiple IP check
+   - Test successful email check
+   - Test successful dashboard check
+   - Test error handling for various exceptions
+
+2. Integration tests with the actual ProxyCheck.io API
+   - Test with real IP addresses
+   - Test with real email addresses
+   - Test rate limiting
+
+3. Mock tests to simulate API responses
+   - Test parsing of various response formats
+   - Test error handling with simulated errors
+
+## Contributing
+
+Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
 
 ## License
 
