@@ -6,6 +6,12 @@ A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg)](https://kotlinlang.org)
 [![Java](https://img.shields.io/badge/java-8%2B-blue.svg)](https://www.oracle.com/java/)
+[![API](https://img.shields.io/badge/API-ProxyCheck.io%20v2-orange.svg)](https://proxycheck.io/api/)
+[![GitHub issues](https://img.shields.io/github/issues/SquareCodeFX/ProxycheckIOApi)](https://github.com/SquareCodeFX/ProxycheckIOApi/issues)
+[![GitHub stars](https://img.shields.io/github/stars/SquareCodeFX/ProxycheckIOApi)](https://github.com/SquareCodeFX/ProxycheckIOApi/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/SquareCodeFX/ProxycheckIOApi)](https://github.com/SquareCodeFX/ProxycheckIOApi/network)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/SquareCodeFX/ProxycheckIOApi/graphs/commit-activity)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://makeapullrequest.com)
 
 ## Table of Contents
 
@@ -14,8 +20,23 @@ A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API
 - [Repository](#repository)
 - [Dependencies](#dependencies)
 - [Usage](#usage)
+  - [Creating a Client](#creating-a-client)
+  - [Caching](#caching)
+  - [Using ProxyCheckOptions](#using-proxycheckoptions)
+  - [Checking a Single IP Address](#checking-a-single-ip-address)
+  - [Checking Multiple IP Addresses](#checking-multiple-ip-addresses)
+  - [Checking Email Addresses](#checking-email-addresses)
+  - [Getting Dashboard Information](#getting-dashboard-information)
+  - [Asynchronous API Usage](#asynchronous-api-usage)
+  - [Error Handling](#error-handling)
+- [API Reference](#api-reference)
+  - [ProxyCheckApiInterface](#proxycheckapiinterface)
+  - [ProxyCheckOptions](#proxycheckoptions)
+  - [Response Models](#response-models)
 - [API Endpoints](#api-endpoints)
 - [Query Flags](#query-flags)
+  - [Available Flag Enums](#available-flag-enums)
+  - [Using Custom Flag Settings](#using-custom-flag-settings)
 - [Exceptions](#exceptions)
 - [Rate Limits](#rate-limits)
 - [Version Compatibility](#version-compatibility)
@@ -546,6 +567,172 @@ try {
 }
 ```
 
+## API Reference
+
+### ProxyCheckApiInterface
+
+The `ProxyCheckApiInterface` defines the contract for the API client. It provides the following methods:
+
+#### `checkIp(ip: String, options: ProxyCheckOptions): ProxyCheckResponse`
+
+Checks a single IP address for proxy information.
+
+**Parameters:**
+- `ip`: The IP address to check.
+- `options`: Optional parameters for the request (see [ProxyCheckOptions](#proxycheckoptions) for details).
+
+**Returns:**
+- A `ProxyCheckResponse` object containing the proxy information.
+
+**Example:**
+```kotlin
+val response = client.checkIp("8.8.8.8")
+```
+
+#### `checkIps(ips: List<String>, options: ProxyCheckOptions): Map<String, ProxyCheckResponse>`
+
+Checks multiple IP addresses for proxy information.
+
+**Parameters:**
+- `ips`: The list of IP addresses to check.
+- `options`: Optional parameters for the request (see [ProxyCheckOptions](#proxycheckoptions) for details).
+
+**Returns:**
+- A map of IP addresses to `ProxyCheckResponse` objects.
+
+**Example:**
+```kotlin
+val responses = client.checkIps(listOf("8.8.8.8", "1.1.1.1"))
+```
+
+#### `getDashboard(options: ProxyCheckOptions): DashboardResponse`
+
+Gets the dashboard information for the account.
+
+**Parameters:**
+- `options`: Optional parameters for the request (see [ProxyCheckOptions](#proxycheckoptions) for details).
+
+**Returns:**
+- A `DashboardResponse` object containing the dashboard information.
+
+**Example:**
+```kotlin
+val dashboard = client.getDashboard()
+```
+
+#### `checkEmail(email: String, options: ProxyCheckOptions): EmailCheckResponse`
+
+Checks if the given email address is from a disposable email provider.
+
+**Parameters:**
+- `email`: The email address to check.
+- `options`: Optional parameters for the request (see [ProxyCheckOptions](#proxycheckoptions) for details).
+
+**Returns:**
+- An `EmailCheckResponse` object containing the response from the API.
+
+**Example:**
+```kotlin
+val emailResponse = client.checkEmail("test@example.com")
+```
+
+### ProxyCheckOptions
+
+The `ProxyCheckOptions` class is used to configure API requests. It provides a flexible way to set various options for the API requests.
+
+#### Constructor Parameters
+
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `flags` | `List<QueryFlag>` | List of query flags to include in the request | `emptyList()` |
+| `vpnDetection` | `Boolean` | Enable VPN detection | `false` |
+| `vpnFlag` | `VpnFlag?` | Specific VPN flag setting (ENABLED, DISABLED) | `null` |
+| `asn` | `Boolean` | Include ASN information | `false` |
+| `asnFlag` | `AsnFlag?` | Specific ASN flag setting (ENABLED, DISABLED) | `null` |
+| `node` | `Boolean` | Include node information | `false` |
+| `nodeFlag` | `NodeFlag?` | Specific node flag setting (ENABLED, DISABLED) | `null` |
+| `time` | `Boolean` | Include time information | `false` |
+| `timeFlag` | `TimeFlag?` | Specific time flag setting (ENABLED, DISABLED) | `null` |
+| `inf` | `Boolean` | Include INF information | `false` |
+| `infFlag` | `InfFlag?` | Specific INF flag setting (ENABLED, DISABLED) | `null` |
+| `risk` | `Boolean` | Include risk information | `false` |
+| `riskFlag` | `RiskFlag?` | Specific risk flag setting (DISABLED, ENABLED, ENHANCED) | `null` |
+| `port` | `Boolean` | Include port information | `false` |
+| `portFlag` | `PortFlag?` | Specific port flag setting (ENABLED, DISABLED) | `null` |
+| `seen` | `Boolean` | Include seen information | `false` |
+| `seenFlag` | `SeenFlag?` | Specific seen flag setting (ENABLED, DISABLED) | `null` |
+| `days` | `Boolean` | Include days information | `false` |
+| `daysFlag` | `DaysFlag?` | Specific days flag setting (ENABLED, DISABLED) | `null` |
+| `tag` | `String?` | Custom tag for the request | `null` |
+| `verFlag` | `VerFlag?` | Specific version flag setting | `null` |
+| `useSSL` | `Boolean` | Use SSL for the request | `true` |
+| `cacheTime` | `Long?` | Custom cache time for the request | `null` |
+| `cacheTimeUnit` | `TimeUnit?` | Custom cache time unit for the request | `null` |
+
+#### Builder Methods
+
+The `ProxyCheckOptions` class provides a builder pattern for easier configuration:
+
+```kotlin
+val options = ProxyCheckOptions.builder()
+    .vpnDetection(true)
+    .asn(true)
+    .time(true)
+    .useSSL(true)
+    .build()
+```
+
+Each builder method corresponds to a parameter in the constructor.
+
+### Response Models
+
+The library provides several response models for different API endpoints:
+
+#### ProxyCheckResponse
+
+The `ProxyCheckResponse` class represents the response from the `checkIp` and `checkIps` methods.
+
+**Properties:**
+- `status`: The status of the request.
+- `statusEnum`: The status as an enum value (`ResponseStatus.SUCCESS`, `ResponseStatus.ERROR`, `ResponseStatus.DENIED`).
+- `ip`: The IP address that was checked.
+- `proxy`: Whether the IP is a proxy (as a string).
+- `proxyEnum`: Whether the IP is a proxy (as an enum value: `ProxyStatus.YES`, `ProxyStatus.NO`, `ProxyStatus.UNKNOWN`).
+- `type`: The type of proxy (as a string).
+- `typeEnum`: The type of proxy (as an enum value: `ProxyType.VPN`, `ProxyType.TOR`, etc.).
+- `risk`: The risk score of the IP.
+- `country`: The country of the IP.
+- `isp`: The ISP of the IP.
+- `asn`: The ASN of the IP.
+- `time`: The time it took to process the request.
+- And many more properties depending on the query flags used.
+
+#### DashboardResponse
+
+The `DashboardResponse` class represents the response from the `getDashboard` method.
+
+**Properties:**
+- `status`: The status of the request.
+- `plan`: The plan of the account.
+- `email`: The email of the account.
+- `queriesToday`: The number of queries used today.
+- `queriesMonth`: The number of queries used this month.
+- `maxQueriesDay`: The maximum number of queries allowed per day.
+- `maxQueriesMonth`: The maximum number of queries allowed per month.
+- `daysUntilReset`: The number of days until the query count resets.
+
+#### EmailCheckResponse
+
+The `EmailCheckResponse` class represents the response from the `checkEmail` method.
+
+**Properties:**
+- `status`: The status of the request.
+- `email`: The email address that was checked.
+- `disposable`: Whether the email is from a disposable provider.
+- `risk`: The risk score of the email.
+- `node`: The node that processed the request.
+- `time`: The time it took to process the request.
+
 ## API Endpoints
 
 This library provides access to the following ProxyCheck.io API endpoints:
@@ -583,6 +770,23 @@ The following query flags are supported:
 - `HOSTNAME`: Returns the hostname of the IP address
 - `ISP`: Returns the ISP of the IP address
 - `MAIL`: Enables email checking for disposable email providers
+
+### Available Flag Enums
+
+The library provides several flag enums for more granular control over API requests:
+
+| Flag Enum | Description | Values |
+|-----------|-------------|--------|
+| `VpnFlag` | Controls VPN detection | `ENABLED` (1), `DISABLED` (0) |
+| `AsnFlag` | Controls ASN information | `ENABLED` (1), `DISABLED` (0) |
+| `NodeFlag` | Controls node information | `ENABLED` (1), `DISABLED` (0) |
+| `TimeFlag` | Controls time information | `ENABLED` (1), `DISABLED` (0) |
+| `InfFlag` | Controls INF information | `ENABLED` (1), `DISABLED` (0) |
+| `RiskFlag` | Controls risk information | `DISABLED` (0), `ENABLED` (1), `ENHANCED` (2) |
+| `PortFlag` | Controls port information | `ENABLED` (1), `DISABLED` (0) |
+| `SeenFlag` | Controls seen information | `ENABLED` (1), `DISABLED` (0) |
+| `DaysFlag` | Controls days information | `ENABLED` (1), `DISABLED` (0) |
+| `VerFlag` | Controls version information | `V1` (1), `V2` (2) |
 
 ### Using Custom Flag Settings
 
