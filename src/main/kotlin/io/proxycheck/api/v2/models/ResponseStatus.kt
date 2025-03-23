@@ -27,6 +27,10 @@ enum class ResponseStatus(val value: String) {
          * @return The corresponding ResponseStatus enum value, or null if not found.
          */
         fun fromString(status: String): ResponseStatus? {
+            // Special case for "ok" which should map to SUCCESS
+            if (status.lowercase() == "ok") {
+                return SUCCESS
+            }
             return values().find { it.value == status.lowercase() }
         }
     }

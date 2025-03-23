@@ -130,6 +130,13 @@ data class ProxyCheckResponse(
         get() = ProxyType.fromString(typeString)
 
     /**
+     * The time it took to process the request in milliseconds as a Double.
+     * This is a convenience property that converts the time string to a Double.
+     */
+    val timeDouble: Double?
+        get() = time?.toDoubleOrNull()
+
+    /**
      * The status of the request.
      * Implementation of ApiResponse interface.
      */

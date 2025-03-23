@@ -185,6 +185,6 @@ class ProxyCheckApiClientTest {
         assertEquals("8.8.8.8", response.ip)
         assertEquals("no", response.proxyString)
         assertEquals(15169, response.asn)
-        assertEquals(0.01, response.time)
+        assertEquals(0.01, response.timeDouble)
     }
 }
