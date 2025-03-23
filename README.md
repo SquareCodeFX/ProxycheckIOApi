@@ -584,6 +584,97 @@ The following query flags are supported:
 - `ISP`: Returns the ISP of the IP address
 - `MAIL`: Enables email checking for disposable email providers
 
+### Using Custom Flag Settings
+
+In addition to the basic query flags, you can use specific flag enums to customize your API requests with more granular control. Here are examples of using different flag enums:
+
+#### VPN Flag
+
+The `VpnFlag` enum allows you to enable or disable VPN detection:
+
+```kotlin
+// Enable VPN detection
+val options = ProxyCheckOptions.builder()
+    .vpnFlag(VpnFlag.ENABLED)  // Value: 1
+    .build()
+
+// Disable VPN detection
+val options = ProxyCheckOptions.builder()
+    .vpnFlag(VpnFlag.DISABLED)  // Value: 0
+    .build()
+```
+
+#### Risk Flag
+
+The `RiskFlag` enum provides different levels of risk information:
+
+```kotlin
+// Basic risk information
+val options = ProxyCheckOptions.builder()
+    .riskFlag(RiskFlag.ENABLED)  // Value: 1
+    .build()
+
+// Enhanced risk information
+val options = ProxyCheckOptions.builder()
+    .riskFlag(RiskFlag.ENHANCED)  // Value: 2
+    .build()
+
+// Disable risk information
+val options = ProxyCheckOptions.builder()
+    .riskFlag(RiskFlag.DISABLED)  // Value: 0
+    .build()
+```
+
+#### Combining Multiple Flags
+
+You can combine multiple flag enums for more comprehensive results:
+
+```kotlin
+// Combine multiple flag enums
+val options = ProxyCheckOptions.builder()
+    .vpnFlag(VpnFlag.ENABLED)
+    .asnFlag(AsnFlag.ENABLED)
+    .riskFlag(RiskFlag.ENHANCED)
+    .timeFlag(TimeFlag.ENABLED)
+    .nodeFlag(NodeFlag.ENABLED)
+    .build()
+
+val response = apiClient.checkIp(
+    ip = "8.8.8.8",
+    options = options
+)
+```
+
+#### Using Additional Query Flags
+
+You can also use the `flags` property to include multiple query flags:
+
+```kotlin
+// Include multiple query flags
+val options = ProxyCheckOptions.builder()
+    .flags(listOf(
+        QueryFlag.VPN,
+        QueryFlag.ASN,
+        QueryFlag.COUNTRY,
+        QueryFlag.ISOCODE,
+        QueryFlag.PROXY_TYPE,
+        QueryFlag.PROVIDER,
+        QueryFlag.CITY,
+        QueryFlag.REGION,
+        QueryFlag.ORGANIZATION,
+        QueryFlag.HOSTNAME,
+        QueryFlag.ISP
+    ))
+    .build()
+
+val response = apiClient.checkIp(
+    ip = "8.8.8.8",
+    options = options
+)
+```
+
+For a complete example of using different query flags with custom settings, see the [CustomFlagsProxyCheckExample.kt](src/main/kotlin/io/proxycheck/api/v2/examples/CustomFlagsProxyCheckExample.kt) file.
+
 ## Exceptions
 
 This library provides a comprehensive set of exceptions to handle various error scenarios:
@@ -663,23 +754,25 @@ The library targets ProxyCheck.io API v2 and is built with:
 
 ## Tests
 
-Currently, there are no tests in the project. Here are some suggested tests to add:
+The project includes unit tests for the `ProxyCheckApiClient` class, which cover:
 
-1. Unit tests for the `ProxyCheckApiClient` class
-   - Test successful IP check
-   - Test successful multiple IP check
-   - Test successful email check
-   - Test successful dashboard check
-   - Test error handling for various exceptions
+- Successful IP checks
+- Successful multiple IP checks
+- Successful email checks
+- Successful dashboard information retrieval
+- Error handling for various exceptions (API key errors, rate limit errors)
+- Testing different flag options and parameters
 
-2. Integration tests with the actual ProxyCheck.io API
+Additional tests that could be added:
+
+1. Integration tests with the actual ProxyCheck.io API
    - Test with real IP addresses
    - Test with real email addresses
    - Test rate limiting
 
-3. Mock tests to simulate API responses
-   - Test parsing of various response formats
-   - Test error handling with simulated errors
+2. More comprehensive mock tests
+   - Test additional response formats
+   - Test more error scenarios
 
 ## Contributing
 

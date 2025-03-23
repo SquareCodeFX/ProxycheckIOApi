@@ -441,4 +441,71 @@ class ProxyCheckApiClientTest {
         assertEquals("8.8.8.8", response.ip)
         assertEquals("no", response.proxyString)
     }
+    @Test
+    fun `checkEmail should return a valid response when the API call is successful`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "email": "test@example.com",
+                "disposable": false,
+                "risk": 0,
+                "node": "test-node",
+                "time": 0.01
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val options = ProxyCheckOptions.builder()
+            .flags(listOf(QueryFlag.MAIL))
+            .build()
+        val response = apiClient.checkEmail(
+            email = "test@example.com",
+            options = options
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.statusEnum)
+        assertEquals("test@example.com", response.email)
+        assertEquals(false, response.disposable)
+        assertEquals(0, response.risk)
+        assertEquals("test-node", response.node)
+        assertEquals("0.01", response.time)
+    }
+
+    @Test
+    fun `getDashboard should return a valid response when the API call is successful`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "plan": "Premium",
+                "email": "test@example.com",
+                "queries_today": 100,
+                "queries_month": 3000,
+                "maxQueries_day": 1000,
+                "maxQueries_month": 30000,
+                "days_until_reset": 15
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val response = apiClient.getDashboard()
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.statusEnum)
+        assertEquals("Premium", response.plan)
+        assertEquals("test@example.com", response.email)
+        assertEquals(100, response.queriesToday)
+        assertEquals(3000, response.queriesMonth)
+        assertEquals(1000, response.maxQueriesDay)
+        assertEquals(30000, response.maxQueriesMonth)
+        assertEquals(15, response.daysUntilReset)
+    }
 }
