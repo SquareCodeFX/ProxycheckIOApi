@@ -20,12 +20,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Asynchronous API support using Kotlin Coroutines
 
 ### Changed
+- Introduced `ProxyCheckApiInterface` and adapter implementations (`ProxyCheckApiClientAdapter`, `ProxyCheckApiAdapter`) for better flexibility and testability
+- Improved API with `ProxyCheckOptions` class for configuring API requests, replacing individual boolean parameters
+- Added builder pattern for `ProxyCheckOptions` with fluent API
+- Enhanced type safety with enum types for status (`ResponseStatus`), proxy status (`ProxyStatus`), and proxy type (`ProxyType`)
+- Added specific flag enums (`VpnFlag`, `AsnFlag`, `NodeFlag`, etc.) for more type-safe configuration
+- Updated examples to demonstrate the new API patterns and enum-based conditional logic
+- Improved documentation with more comprehensive examples
 
 ### Deprecated
+- Direct use of boolean parameters in API methods (use `ProxyCheckOptions` instead)
 
 ### Removed
 
 ### Fixed
+- Fixed issues with setting both flags and individual boolean parameters by using `ProxyCheckOptions`
 
 ### Security
 

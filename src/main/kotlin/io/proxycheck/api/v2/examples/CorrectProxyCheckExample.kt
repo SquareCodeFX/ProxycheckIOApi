@@ -3,25 +3,23 @@ package io.proxycheck.api.v2.examples
 import io.proxycheck.api.v2.ProxyCheckApiAdapter
 import io.proxycheck.api.v2.ProxyCheckApiClientAdapter
 import io.proxycheck.api.v2.ProxyCheckApiInterface
-import io.proxycheck.api.v2.models.ProxyCheckOptions
-import io.proxycheck.api.v2.models.ProxyStatus
-import io.proxycheck.api.v2.models.ProxyType
-import io.proxycheck.api.v2.models.QueryFlag
-import io.proxycheck.api.v2.models.ResponseStatus
+import io.proxycheck.api.v2.models.*
 
 /**
- * Example usage of the enhanced ProxyCheck.io API client with enums and interfaces.
+ * Example usage of the ProxyCheck.io API client with the correct approach.
+ * This example demonstrates how to use the ProxyCheckOptions class to avoid issues
+ * with setting both flags and individual boolean parameters.
  */
-object EnhancedProxyCheckExample {
+object CorrectProxyCheckExample {
     /**
-     * Main method to demonstrate the usage of the enhanced ProxyCheck.io API client.
+     * Main method to demonstrate the usage of the ProxyCheck.io API client.
      */
     @JvmStatic
     fun main(args: Array<String>) {
         // Create a new API client using the adapter (implements ProxyCheckApiInterface)
         // Replace "YOUR_API_KEY" with your actual API key
         val apiClient: ProxyCheckApiInterface = ProxyCheckApiClientAdapter(apiKey = "YOUR_API_KEY")
-
+        
         // You can also use the ProxyCheckApiAdapter which delegates to ProxyCheckApi
         // val apiClient: ProxyCheckApiInterface = ProxyCheckApiAdapter(apiKey = "YOUR_API_KEY")
 
@@ -33,14 +31,9 @@ object EnhancedProxyCheckExample {
                 vpnDetection = true,
                 asn = true,
                 time = true,
-                node = false,
-                risk = false,
-                port = false,
-                seen = false,
-                days = false,
                 useSSL = true
             )
-
+            
             val response = apiClient.checkIp(
                 ip = "8.8.8.8",
                 options = options
@@ -56,20 +49,20 @@ object EnhancedProxyCheckExample {
             println("ISP: ${response.isp}")
             println("ASN: ${response.asn}")
             println("Time: ${response.time}")
-
+            
             // Example of using the enum values for conditional logic
             when (response.statusEnum) {
                 ResponseStatus.SUCCESS -> println("Request was successful")
                 ResponseStatus.ERROR -> println("Request encountered an error")
                 ResponseStatus.DENIED -> println("Request was denied")
             }
-
+            
             when (response.proxyEnum) {
                 ProxyStatus.YES -> println("This IP is a proxy")
                 ProxyStatus.NO -> println("This IP is not a proxy")
                 ProxyStatus.UNKNOWN -> println("Proxy status is unknown")
             }
-
+            
             when (response.typeEnum) {
                 ProxyType.VPN -> println("This is a VPN")
                 ProxyType.TOR -> println("This is a TOR node")
@@ -79,7 +72,7 @@ object EnhancedProxyCheckExample {
                 ProxyType.HOSTING -> println("This is a hosting provider")
                 ProxyType.UNKNOWN -> println("Proxy type is unknown")
             }
-
+            
             println()
         } catch (e: Exception) {
             println("Error: ${e.message}")
@@ -88,12 +81,13 @@ object EnhancedProxyCheckExample {
         // Example 2: Check multiple IP addresses
         println("Example 2: Check multiple IP addresses")
         try {
-            // Create options with the flags we need
+            // Create options with only the flags we need
+            // This avoids setting both flags and individual boolean parameters
             val options = ProxyCheckOptions(
                 flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME),
                 useSSL = true
             )
-
+            
             val responses = apiClient.checkIps(
                 ips = listOf("8.8.8.8", "1.1.1.1"),
                 options = options
@@ -128,6 +122,33 @@ object EnhancedProxyCheckExample {
             println("Max Queries Day: ${dashboard.maxQueriesDay}")
             println("Max Queries Month: ${dashboard.maxQueriesMonth}")
             println("Days Until Reset: ${dashboard.daysUntilReset}")
+            println()
+        } catch (e: Exception) {
+            println("Error: ${e.message}")
+        }
+        
+        // Example 4: Check an email address
+        println("Example 4: Check an email address")
+        try {
+            // Create options with the parameters we need
+            val options = ProxyCheckOptions(
+                flags = listOf(QueryFlag.MAIL),
+                risk = true,
+                node = true,
+                time = true
+            )
+            
+            val emailResponse = apiClient.checkEmail(
+                email = "test@example.com",
+                options = options
+            )
+
+            println("Status: ${emailResponse.status}")
+            println("Email: ${emailResponse.email}")
+            println("Disposable: ${emailResponse.disposable}")
+            println("Risk: ${emailResponse.risk}")
+            println("Node: ${emailResponse.node}")
+            println("Time: ${emailResponse.time}")
             println()
         } catch (e: Exception) {
             println("Error: ${e.message}")

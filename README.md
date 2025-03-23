@@ -105,6 +105,10 @@ For testing, the following dependencies are used:
 
 ### Creating a Client
 
+There are two ways to create a client:
+
+#### Option 1: Using the Direct Client Implementation
+
 ```kotlin
 // Create a client with your API key
 val client = ProxyCheckApiClient(apiKey = "your-api-key")
@@ -126,6 +130,38 @@ val client = ProxyCheckApiClient(
 
 // Create a client with caching enabled
 val client = ProxyCheckApiClient(
+    apiKey = "your-api-key",
+    enableCaching = true,
+    defaultCacheTime = 5,
+    defaultCacheTimeUnit = TimeUnit.MINUTES
+)
+```
+
+#### Option 2: Using the Interface and Adapters (Recommended)
+
+This approach provides better flexibility and testability through dependency injection.
+
+```kotlin
+// Create a client using the adapter (implements ProxyCheckApiInterface)
+val apiClient: ProxyCheckApiInterface = ProxyCheckApiClientAdapter(apiKey = "your-api-key")
+
+// You can also use the ProxyCheckApiAdapter which delegates to ProxyCheckApi
+val apiClient: ProxyCheckApiInterface = ProxyCheckApiAdapter(apiKey = "your-api-key")
+
+// Create a client with custom settings
+val apiClient: ProxyCheckApiInterface = ProxyCheckApiClientAdapter(
+    apiKey = "your-api-key",
+    client = OkHttpClient.Builder()
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .writeTimeout(5, TimeUnit.SECONDS)
+        .build(),
+    baseUrl = "https://proxycheck.io/v2/",
+    gson = Gson()
+)
+
+// Create a client with caching enabled
+val apiClient: ProxyCheckApiInterface = ProxyCheckApiClientAdapter(
     apiKey = "your-api-key",
     enableCaching = true,
     defaultCacheTime = 5,
@@ -180,27 +216,65 @@ val emailResponse = client.checkEmail(
 
 The same caching functionality is available for asynchronous methods as well.
 
+### Using ProxyCheckOptions
+
+The library now uses a `ProxyCheckOptions` class to configure API requests. This approach avoids issues with setting both flags and individual boolean parameters.
+
+```kotlin
+// Create options with the parameters we need
+val options = ProxyCheckOptions(
+    vpnDetection = true,
+    asn = true,
+    time = true,
+    useSSL = true
+)
+
+// Or use the builder pattern
+val options = ProxyCheckOptions.builder()
+    .vpnDetection(true)
+    .asn(true)
+    .time(true)
+    .useSSL(true)
+    .build()
+
+// You can also set specific flag enums for more control
+val options = ProxyCheckOptions.builder()
+    .vpnFlag(VpnFlag.ENABLED)
+    .asnFlag(AsnFlag.ENABLED)
+    .timeFlag(TimeFlag.ENABLED)
+    .riskFlag(RiskFlag.ENHANCED)
+    .useSSL(true)
+    .build()
+```
+
 ### Checking a Single IP Address
 
 ```kotlin
 // Basic check
 val response = client.checkIp("8.8.8.8")
 
-// Check with VPN detection
+// Check with options
+val options = ProxyCheckOptions(
+    vpnDetection = true,
+    asn = true,
+    time = true
+)
 val response = client.checkIp(
     ip = "8.8.8.8",
-    vpnDetection = true
+    options = options
 )
 
 // Check with multiple flags
+val options = ProxyCheckOptions(
+    flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+)
 val response = client.checkIp(
     ip = "8.8.8.8",
-    flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+    options = options
 )
 
 // Check with all options
-val response = client.checkIp(
-    ip = "8.8.8.8",
+val options = ProxyCheckOptions(
     flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME),
     vpnDetection = true,
     asn = true,
@@ -213,17 +287,44 @@ val response = client.checkIp(
     tag = "my-tag",
     useSSL = true
 )
+val response = client.checkIp(
+    ip = "8.8.8.8",
+    options = options
+)
 
 // Access the response data
-println("Status: ${response.status}")
+println("Status: ${response.statusEnum} (${response.status.value})")
 println("IP: ${response.ip}")
-println("Proxy: ${response.proxyEnum}")
-println("Type: ${response.typeEnum}")
+println("Proxy: ${response.proxyEnum} (${response.proxyString})")
+println("Type: ${response.typeEnum} (${response.typeString})")
 println("Risk: ${response.risk}")
 println("Country: ${response.country}")
 println("ISP: ${response.isp}")
 println("ASN: ${response.asn}")
 println("Time: ${response.time}")
+
+// Using enum values for conditional logic
+when (response.statusEnum) {
+    ResponseStatus.SUCCESS -> println("Request was successful")
+    ResponseStatus.ERROR -> println("Request encountered an error")
+    ResponseStatus.DENIED -> println("Request was denied")
+}
+
+when (response.proxyEnum) {
+    ProxyStatus.YES -> println("This IP is a proxy")
+    ProxyStatus.NO -> println("This IP is not a proxy")
+    ProxyStatus.UNKNOWN -> println("Proxy status is unknown")
+}
+
+when (response.typeEnum) {
+    ProxyType.VPN -> println("This is a VPN")
+    ProxyType.TOR -> println("This is a TOR node")
+    ProxyType.PUBLIC -> println("This is a public proxy")
+    ProxyType.RESIDENTIAL -> println("This is a residential proxy")
+    ProxyType.WEB -> println("This is a web proxy")
+    ProxyType.HOSTING -> println("This is a hosting provider")
+    ProxyType.UNKNOWN -> println("Proxy type is unknown")
+}
 ```
 
 ### Checking Multiple IP Addresses
@@ -232,24 +333,32 @@ println("Time: ${response.time}")
 // Basic check
 val responses = client.checkIps(listOf("8.8.8.8", "1.1.1.1"))
 
-// Check with VPN detection
+// Check with options
+val options = ProxyCheckOptions(
+    vpnDetection = true,
+    asn = true,
+    time = true
+)
 val responses = client.checkIps(
     ips = listOf("8.8.8.8", "1.1.1.1"),
-    vpnDetection = true
+    options = options
 )
 
 // Check with multiple flags
+val options = ProxyCheckOptions(
+    flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+)
 val responses = client.checkIps(
     ips = listOf("8.8.8.8", "1.1.1.1"),
-    flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+    options = options
 )
 
 // Access the response data
 for ((ip, response) in responses) {
     println("IP: $ip")
-    println("Status: ${response.status}")
-    println("Proxy: ${response.proxyEnum}")
-    println("Type: ${response.typeEnum}")
+    println("Status: ${response.statusEnum} (${response.status.value})")
+    println("Proxy: ${response.proxyEnum} (${response.proxyString})")
+    println("Type: ${response.typeEnum} (${response.typeString})")
     println("Risk: ${response.risk}")
     println("Country: ${response.country}")
     println("ISP: ${response.isp}")
@@ -267,8 +376,7 @@ The library also provides functionality to check if an email address is from a d
 val emailResponse = client.checkEmail("test@example.com")
 
 // Email check with additional options
-val emailResponse = client.checkEmail(
-    email = "test@example.com",
+val options = ProxyCheckOptions(
     flags = listOf(QueryFlag.MAIL),
     risk = true,
     node = true,
@@ -276,9 +384,13 @@ val emailResponse = client.checkEmail(
     tag = "my-tag",
     useSSL = true
 )
+val emailResponse = client.checkEmail(
+    email = "test@example.com",
+    options = options
+)
 
 // Access the email response data
-println("Status: ${emailResponse.status}")
+println("Status: ${emailResponse.statusEnum} (${emailResponse.status.value})")
 println("Email: ${emailResponse.email}")
 println("Disposable: ${emailResponse.disposable}")
 println("Risk: ${emailResponse.risk}")

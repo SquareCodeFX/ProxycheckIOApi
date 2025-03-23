@@ -1,6 +1,7 @@
 package io.proxycheck.api.v2.examples
 
 import io.proxycheck.api.v2.ProxyCheckApiClient
+import io.proxycheck.api.v2.models.ProxyCheckOptions
 import io.proxycheck.api.v2.models.QueryFlag
 import kotlinx.coroutines.runBlocking
 
@@ -23,11 +24,16 @@ object ProxyCheckExample {
         // Example 1: Check a single IP address
         println("Example 1: Check a single IP address")
         try {
-            val response = apiClient.checkIp(
-                ip = "8.8.8.8",
+            // Create options with the parameters we need
+            val options = ProxyCheckOptions(
                 vpnDetection = true,
                 asn = true,
                 time = true
+            )
+
+            val response = apiClient.checkIp(
+                ip = "8.8.8.8",
+                options = options
             )
 
             println("Status: ${response.status}")
@@ -47,9 +53,14 @@ object ProxyCheckExample {
         // Example 2: Check multiple IP addresses
         println("Example 2: Check multiple IP addresses")
         try {
+            // Create options with the flags we need
+            val options = ProxyCheckOptions(
+                flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+            )
+
             val responses = apiClient.checkIps(
                 ips = listOf("8.8.8.8", "1.1.1.1"),
-                flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+                options = options
             )
 
             for ((ip, response) in responses) {
@@ -89,11 +100,17 @@ object ProxyCheckExample {
         // Example 4: Check an email address
         println("Example 4: Check an email address")
         try {
-            val emailResponse = apiClient.checkEmail(
-                email = "test@example.com",
+            // Create options with the parameters we need
+            val options = ProxyCheckOptions(
+                flags = listOf(QueryFlag.MAIL),
                 risk = true,
                 node = true,
                 time = true
+            )
+
+            val emailResponse = apiClient.checkEmail(
+                email = "test@example.com",
+                options = options
             )
 
             println("Status: ${emailResponse.status}")
@@ -115,11 +132,16 @@ object ProxyCheckExample {
             // Example 5: Check a single IP address asynchronously
             println("Example 5: Check a single IP address asynchronously")
             try {
-                val response = apiClient.checkIpAsync(
-                    ip = "8.8.8.8",
+                // Create options with the parameters we need
+                val options = ProxyCheckOptions(
                     vpnDetection = true,
                     asn = true,
                     time = true
+                )
+
+                val response = apiClient.checkIpAsync(
+                    ip = "8.8.8.8",
+                    options = options
                 )
 
                 println("Status: ${response.status}")
@@ -139,9 +161,14 @@ object ProxyCheckExample {
             // Example 6: Check multiple IP addresses asynchronously
             println("Example 6: Check multiple IP addresses asynchronously")
             try {
+                // Create options with the flags we need
+                val options = ProxyCheckOptions(
+                    flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+                )
+
                 val responses = apiClient.checkIpsAsync(
                     ips = listOf("8.8.8.8", "1.1.1.1"),
-                    flags = listOf(QueryFlag.VPN, QueryFlag.ASN, QueryFlag.TIME)
+                    options = options
                 )
 
                 for ((ip, response) in responses) {
@@ -181,11 +208,17 @@ object ProxyCheckExample {
             // Example 8: Check an email address asynchronously
             println("Example 8: Check an email address asynchronously")
             try {
-                val emailResponse = apiClient.checkEmailAsync(
-                    email = "test@example.com",
+                // Create options with the parameters we need
+                val options = ProxyCheckOptions(
+                    flags = listOf(QueryFlag.MAIL),
                     risk = true,
                     node = true,
                     time = true
+                )
+
+                val emailResponse = apiClient.checkEmailAsync(
+                    email = "test@example.com",
+                    options = options
                 )
 
                 println("Status: ${emailResponse.status}")

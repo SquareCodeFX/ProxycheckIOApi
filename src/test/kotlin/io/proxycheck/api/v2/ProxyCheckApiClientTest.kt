@@ -335,9 +335,12 @@ class ProxyCheckApiClientTest {
         whenever(mockResponseBody.string()).thenReturn(jsonResponse)
 
         // Act
+        val options = ProxyCheckOptions.builder()
+            .infFlag(InfFlag.ENABLED) // Value 1
+            .build()
         val response = apiClient.checkIp(
             ip = "8.8.8.8",
-            infFlag = InfFlag.ENABLED // Value 1
+            options = options
         )
 
         // Assert
@@ -363,9 +366,12 @@ class ProxyCheckApiClientTest {
         whenever(mockResponseBody.string()).thenReturn(jsonResponse)
 
         // Act
+        val options = ProxyCheckOptions.builder()
+            .riskFlag(RiskFlag.ENHANCED) // Value 2
+            .build()
         val response = apiClient.checkIp(
             ip = "8.8.8.8",
-            riskFlag = RiskFlag.ENHANCED // Value 2
+            options = options
         )
 
         // Assert
@@ -391,9 +397,12 @@ class ProxyCheckApiClientTest {
         whenever(mockResponseBody.string()).thenReturn(jsonResponse)
 
         // Act
+        val options = ProxyCheckOptions.builder()
+            .portFlag(PortFlag.ENABLED) // Value 1
+            .build()
         val response = apiClient.checkIp(
             ip = "8.8.8.8",
-            portFlag = PortFlag.ENABLED // Value 1
+            options = options
         )
 
         // Assert
@@ -418,9 +427,12 @@ class ProxyCheckApiClientTest {
         whenever(mockResponseBody.string()).thenReturn(jsonResponse)
 
         // Act
+        val options = ProxyCheckOptions.builder()
+            .seenFlag(SeenFlag.ENABLED) // Value 1
+            .build()
         val response = apiClient.checkIp(
             ip = "8.8.8.8",
-            seenFlag = SeenFlag.ENABLED // Value 1
+            options = options
         )
 
         // Assert
