@@ -442,6 +442,36 @@ class ProxyCheckApiClientTest {
         assertEquals("no", response.proxyString)
     }
     @Test
+    fun `checkIp should include TAG flag with custom string value in the request`() {
+        // Arrange
+        val jsonResponse = """
+            {
+                "status": "ok",
+                "ip": "8.8.8.8",
+                "proxy": "no",
+                "vpn": false
+            }
+        """.trimIndent()
+
+        whenever(mockResponseBody.string()).thenReturn(jsonResponse)
+
+        // Act
+        val options = ProxyCheckOptions.builder()
+            .tagFlag(TagFlag.of("my-custom-tag")) // Custom tag value
+            .build()
+        val response = apiClient.checkIp(
+            ip = "8.8.8.8",
+            options = options
+        )
+
+        // Assert
+        assertNotNull(response)
+        assertEquals(ResponseStatus.SUCCESS, response.status)
+        assertEquals("8.8.8.8", response.ip)
+        assertEquals("no", response.proxyString)
+    }
+
+    @Test
     fun `checkEmail should return a valid response when the API call is successful`() {
         // Arrange
         val jsonResponse = """
