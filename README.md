@@ -2,7 +2,7 @@
 
 A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API v2. This library provides a simple and easy-to-use interface for checking if an IP address is a proxy, VPN, or TOR exit node, as well as validating email addresses.
 
-[![JitPack](https://jitpack.io/v/org.example/proxycheck-api.svg)](https://jitpack.io/#org.example/proxycheck-api)
+[![JitPack](https://jitpack.io/v/SquareCodeFX/ProxycheckIOApi.svg)](https://jitpack.io/#SquareCodeFX/ProxycheckIOApi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Kotlin](https://img.shields.io/badge/kotlin-1.9.0-blue.svg)](https://kotlinlang.org)
 [![Java](https://img.shields.io/badge/java-8%2B-blue.svg)](https://www.oracle.com/java/)
@@ -22,6 +22,8 @@ A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API
 - [Tests](#tests)
 - [Contributing](#contributing)
 - [License](#license)
+- [Changelog](#changelog)
+- [Issues and Support](#issues-and-support)
 
 ## Features
 
@@ -42,7 +44,7 @@ A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API
 
 ```kotlin
 dependencies {
-    implementation("org.example:proxycheck-api:1.0-SNAPSHOT")
+    implementation("com.github.SquareCodeFX:ProxycheckIOApi:1.0-SNAPSHOT")
 }
 ```
 
@@ -50,8 +52,8 @@ dependencies {
 
 ```xml
 <dependency>
-    <groupId>org.example</groupId>
-    <artifactId>proxycheck-api</artifactId>
+    <groupId>com.github.SquareCodeFX</groupId>
+    <artifactId>ProxycheckIOApi</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -573,4 +575,24 @@ Contributions are welcome! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) fil
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Changelog
+
+All notable changes to this project are documented in the [CHANGELOG.md](CHANGELOG.md) file.
+
+## Issues and Support
+
+If you encounter any issues or have questions about using this library, please:
+
+1. Check the [existing issues](https://github.com/SquareCodeFX/ProxycheckIOApi/issues) to see if your problem has already been reported
+2. Open a [new issue](https://github.com/SquareCodeFX/ProxycheckIOApi/issues/new) if your problem hasn't been reported yet
+3. Provide as much information as possible, including:
+   - Steps to reproduce the issue
+   - Expected behavior
+   - Actual behavior
+   - Code samples
+   - Error messages
+   - Your environment (Java/Kotlin version, OS, etc.)
+
+For feature requests, please open an issue with the "enhancement" label.
