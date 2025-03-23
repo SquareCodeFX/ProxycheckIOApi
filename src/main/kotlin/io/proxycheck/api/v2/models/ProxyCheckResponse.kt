@@ -22,15 +22,13 @@ data class ProxyCheckResponse(
      * The proxy status of the IP address as a string.
      * @see proxyEnum for the enum representation.
      */
-    @SerializedName("proxy")
-    private val proxyString: String? = null,
+    @SerializedName("proxy") val proxyString: String? = null,
 
     /**
      * The type of proxy if the IP is a proxy as a string.
      * @see typeEnum for the enum representation.
      */
-    @SerializedName("type")
-    private val typeString: String? = null,
+    @SerializedName("type") val typeString: String? = null,
 
     /**
      * The risk score of the IP address (0-100).
