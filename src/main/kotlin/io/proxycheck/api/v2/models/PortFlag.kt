@@ -4,7 +4,7 @@ package io.proxycheck.api.v2.models
  * Enum representing the PORT query flag values that can be used with the ProxyCheck.io API.
  * The PORT flag can have values 0 or 1, each with a different meaning.
  */
-enum class PortFlag(val value: Int) {
+enum class PortFlag(override val value: Int) : IntEnumFlag {
     /**
      * Disable port information in the response.
      */
@@ -23,7 +23,7 @@ enum class PortFlag(val value: Int) {
          * @return The corresponding PortFlag enum, or ENABLED if the value is not valid.
          */
         fun fromValue(value: Int): PortFlag {
-            return values().find { it.value == value } ?: ENABLED
+            return FlagUtils.fromValue(value, values(), ENABLED)
         }
     }
 }

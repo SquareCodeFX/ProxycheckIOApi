@@ -6,7 +6,7 @@ package io.proxycheck.api.v2.models
  *
  * @property value The integer value for the days flag.
  */
-class DaysFlag(val value: Int) {
+class DaysFlag(override val value: Int) : IntFlag {
     companion object {
         /**
          * Create a DaysFlag with the specified number of days.

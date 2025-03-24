@@ -10,7 +10,7 @@ import java.util.Locale
  *
  * @property value The date string in the format DD-Month-YYYY.
  */
-class VerFlag(val value: String) {
+class VerFlag(override val value: String) : StringFlag {
     companion object {
         private val DATE_FORMAT = SimpleDateFormat("dd-MMMM-yyyy", Locale.US)
 

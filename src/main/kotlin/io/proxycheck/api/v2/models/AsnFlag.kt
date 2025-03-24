@@ -4,7 +4,7 @@ package io.proxycheck.api.v2.models
  * Enum representing the ASN query flag values that can be used with the ProxyCheck.io API.
  * The ASN flag can have values 0 or 1, each with a different meaning.
  */
-enum class AsnFlag(val value: Int) {
+enum class AsnFlag(override val value: Int) : IntEnumFlag {
     /**
      * Disable ASN data in the response.
      */
@@ -23,7 +23,7 @@ enum class AsnFlag(val value: Int) {
          * @return The corresponding AsnFlag enum, or ENABLED if the value is not valid.
          */
         fun fromValue(value: Int): AsnFlag {
-            return values().find { it.value == value } ?: ENABLED
+            return FlagUtils.fromValue(value, values(), ENABLED)
         }
     }
 }

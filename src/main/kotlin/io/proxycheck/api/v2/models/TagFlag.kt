@@ -6,7 +6,7 @@ package io.proxycheck.api.v2.models
  *
  * @property value The string value for the tag flag.
  */
-class TagFlag(val value: String) {
+class TagFlag(override val value: String) : StringFlag {
     companion object {
         /**
          * Create a TagFlag with the specified tag string.

@@ -4,7 +4,7 @@ package io.proxycheck.api.v2.models
  * Enum representing the VPN query flag values that can be used with the ProxyCheck.io API.
  * The VPN flag can have values 0, 1, 2, or 3, each with a different meaning.
  */
-enum class VpnFlag(val value: Int) {
+enum class VpnFlag(override val value: Int) : IntEnumFlag {
     /**
      * Disable VPN detection.
      */
@@ -33,7 +33,7 @@ enum class VpnFlag(val value: Int) {
          * @return The corresponding VpnFlag enum, or ENABLED if the value is not valid.
          */
         fun fromValue(value: Int): VpnFlag {
-            return values().find { it.value == value } ?: ENABLED
+            return FlagUtils.fromValue(value, values(), ENABLED)
         }
     }
 }

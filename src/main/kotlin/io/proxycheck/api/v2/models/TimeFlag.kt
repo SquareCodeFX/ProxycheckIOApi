@@ -4,7 +4,7 @@ package io.proxycheck.api.v2.models
  * Enum representing the TIME query flag values that can be used with the ProxyCheck.io API.
  * The TIME flag can have values 0 or 1, each with a different meaning.
  */
-enum class TimeFlag(val value: Int) {
+enum class TimeFlag(override val value: Int) : IntEnumFlag {
     /**
      * Disable time information in the response.
      */
@@ -23,7 +23,7 @@ enum class TimeFlag(val value: Int) {
          * @return The corresponding TimeFlag enum, or ENABLED if the value is not valid.
          */
         fun fromValue(value: Int): TimeFlag {
-            return values().find { it.value == value } ?: ENABLED
+            return FlagUtils.fromValue(value, values(), ENABLED)
         }
     }
 }

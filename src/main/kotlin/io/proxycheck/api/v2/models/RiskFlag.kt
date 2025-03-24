@@ -4,7 +4,7 @@ package io.proxycheck.api.v2.models
  * Enum representing the RISK query flag values that can be used with the ProxyCheck.io API.
  * The RISK flag can have values 0, 1, or 2, each with a different meaning.
  */
-enum class RiskFlag(val value: Int) {
+enum class RiskFlag(override val value: Int) : IntEnumFlag {
     /**
      * Disable risk information in the response.
      */
@@ -28,7 +28,7 @@ enum class RiskFlag(val value: Int) {
          * @return The corresponding RiskFlag enum, or ENABLED if the value is not valid.
          */
         fun fromValue(value: Int): RiskFlag {
-            return values().find { it.value == value } ?: ENABLED
+            return FlagUtils.fromValue(value, values(), ENABLED)
         }
     }
 }

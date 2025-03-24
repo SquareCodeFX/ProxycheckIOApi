@@ -4,7 +4,7 @@ package io.proxycheck.api.v2.models
  * Enum representing the NODE query flag values that can be used with the ProxyCheck.io API.
  * The NODE flag can have values 0 or 1, each with a different meaning.
  */
-enum class NodeFlag(val value: Int) {
+enum class NodeFlag(override val value: Int) : IntEnumFlag {
     /**
      * Disable node information in the response.
      */
@@ -23,7 +23,7 @@ enum class NodeFlag(val value: Int) {
          * @return The corresponding NodeFlag enum, or ENABLED if the value is not valid.
          */
         fun fromValue(value: Int): NodeFlag {
-            return values().find { it.value == value } ?: ENABLED
+            return FlagUtils.fromValue(value, values(), ENABLED)
         }
     }
 }
