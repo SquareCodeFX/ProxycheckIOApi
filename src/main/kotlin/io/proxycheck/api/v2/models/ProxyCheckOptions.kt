@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit
  * @property days Whether to include the days since the proxy was first detected in the response.
  * @property daysFlag The days flag, overrides days if provided.
  * @property tag A custom tag to identify the request.
+ * @property tagFlag The tag flag, provides a custom string for query tagging.
  * @property verFlag The version flag.
  * @property useSSL Whether to use SSL for the request.
  * @property cacheTime The time to cache the response, or null to use the default.
@@ -52,6 +53,7 @@ data class ProxyCheckOptions(
     val days: Boolean = false,
     val daysFlag: DaysFlag? = null,
     val tag: String? = null,
+    val tagFlag: TagFlag? = null,
     val verFlag: VerFlag? = null,
     val useSSL: Boolean = true,
     val cacheTime: Long? = null,
@@ -81,6 +83,7 @@ data class ProxyCheckOptions(
         private var days: Boolean = false
         private var daysFlag: DaysFlag? = null
         private var tag: String? = null
+        private var tagFlag: TagFlag? = null
         private var verFlag: VerFlag? = null
         private var useSSL: Boolean = true
         private var cacheTime: Long? = null
@@ -187,6 +190,11 @@ data class ProxyCheckOptions(
         fun tag(tag: String) = apply { this.tag = tag }
 
         /**
+         * Set the tag flag.
+         */
+        fun tagFlag(flag: TagFlag) = apply { this.tagFlag = flag }
+
+        /**
          * Set the version flag.
          */
         fun verFlag(flag: VerFlag) = apply { this.verFlag = flag }
@@ -210,7 +218,7 @@ data class ProxyCheckOptions(
         fun build() = ProxyCheckOptions(
             flags, vpnDetection, vpnFlag, asn, asnFlag, node, nodeFlag, time, timeFlag,
             inf, infFlag, risk, riskFlag, port, portFlag, seen, seenFlag, days, daysFlag,
-            tag, verFlag, useSSL, cacheTime, cacheTimeUnit
+            tag, tagFlag, verFlag, useSSL, cacheTime, cacheTimeUnit
         )
     }
 
