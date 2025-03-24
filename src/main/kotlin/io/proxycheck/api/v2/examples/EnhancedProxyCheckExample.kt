@@ -1,13 +1,13 @@
 package io.proxycheck.api.v2.examples
 
-import io.proxycheck.api.v2.ProxyCheckApiAdapter
-import io.proxycheck.api.v2.ProxyCheckApiClientAdapter
-import io.proxycheck.api.v2.ProxyCheckApiInterface
+import io.proxycheck.api.v2.client.ProxyCheckApiAdapter
+import io.proxycheck.api.v2.client.ProxyCheckApiClientAdapter
+import io.proxycheck.api.v2.client.ProxyCheckApiInterface
 import io.proxycheck.api.v2.models.ProxyCheckOptions
-import io.proxycheck.api.v2.models.ProxyStatus
-import io.proxycheck.api.v2.models.ProxyType
-import io.proxycheck.api.v2.models.QueryFlag
-import io.proxycheck.api.v2.models.ResponseStatus
+import io.proxycheck.api.v2.models.enum.ProxyStatus
+import io.proxycheck.api.v2.models.enum.ProxyType
+import io.proxycheck.api.v2.models.enum.ResponseStatus
+import io.proxycheck.api.v2.models.flag.QueryFlag
 
 /**
  * Example usage of the enhanced ProxyCheck.io API client with enums and interfaces.

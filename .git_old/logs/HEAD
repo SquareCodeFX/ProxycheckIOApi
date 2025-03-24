@@ -1,0 +1,21 @@
+0000000000000000000000000000000000000000 6b6a36886c5f71401f291a81e920713c0168e408 square <admin@squarecode.de> 1742691429 +0100	commit (initial): Init
+6b6a36886c5f71401f291a81e920713c0168e408 80907490094e4686a6a69f035f82a8164879cb51 square <admin@squarecode.de> 1742691539 +0100	commit: Refactor fields to be public in ProxyCheckResponse.
+80907490094e4686a6a69f035f82a8164879cb51 d7f7792a4b8c1ac792c3ce170663ac7d77cdb39d square <admin@squarecode.de> 1742731047 +0100	commit: Set JVM target to 11 for Kotlin compilation
+d7f7792a4b8c1ac792c3ce170663ac7d77cdb39d e65acd7e11addc3c907964bad51dbf9da872fa8e square <admin@squarecode.de> 1742731060 +0100	commit: Add CONTRIBUTING guidelines and update README.md
+e65acd7e11addc3c907964bad51dbf9da872fa8e 2950b39d6f649feb58e44544abce0aacecf6bd1c square <admin@squarecode.de> 1742731074 +0100	commit: Add unit tests for ProxyCheckApiClient
+2950b39d6f649feb58e44544abce0aacecf6bd1c 2802f2cbbf100aad82f44f506d534805df5cc644 square <admin@squarecode.de> 1742732233 +0100	commit: Update project repository metadata and contribution guidelines
+2802f2cbbf100aad82f44f506d534805df5cc644 513c73cf4e5f307aad6b4ccb96e7cc45f5e89dbc square <admin@squarecode.de> 1742734510 +0100	commit: Simplify API model mappings and prepare for release v1.0.0.
+513c73cf4e5f307aad6b4ccb96e7cc45f5e89dbc 06375e827cc5ca1be81ea9971618a3d476ebe92f square <admin@squarecode.de> 1742749435 +0100	commit: Refactor ProxyCheck API to use ProxyCheckOptions for configurations
+06375e827cc5ca1be81ea9971618a3d476ebe92f 0648d9eb175cb7eef74977f0625072c6d80a2f82 square <admin@squarecode.de> 1742755923 +0100	commit: Refactor API methods to use ProxyCheckOptions for configuration
+0648d9eb175cb7eef74977f0625072c6d80a2f82 a23e78073cc11e55b264f1fe49f6ddbc5f532c78 square <admin@squarecode.de> 1742758676 +0100	commit: Update README.md to reflect existing tests, add CustomFlagsProxyCheckExample, and update tests
+a23e78073cc11e55b264f1fe49f6ddbc5f532c78 a4e390192342bdc51c6521a7ae8f2465feed82cf square <admin@squarecode.de> 1742766236 +0100	commit: Enhance README with badges, API reference, and examples
+a4e390192342bdc51c6521a7ae8f2465feed82cf 3aa09837f4ffd8a5a290f0ec3221d34bdf1ddc1f square <admin@squarecode.de> 1742768740 +0100	commit: Add test for `checkIp` with custom TAG flag in request
+3aa09837f4ffd8a5a290f0ec3221d34bdf1ddc1f b2cf7352d293cdb7c45ff6d00dc9b6447469583d square <admin@squarecode.de> 1742768754 +0100	commit: Add TagFlag class and extend VpnFlag for additional modes
+b2cf7352d293cdb7c45ff6d00dc9b6447469583d 5dd82315d86325f3b4267fac5e60feda347d6d41 square <admin@squarecode.de> 1742835321 +0100	commit: Refactor flag model hierarchy and standardize value handling
+5dd82315d86325f3b4267fac5e60feda347d6d41 9f573708186320cfdcc8e964540967afff094407 square <admin@squarecode.de> 1742835335 +0100	commit: Add ExceptionHandler for managing ProxyCheck API errors
+9f573708186320cfdcc8e964540967afff094407 22c85d628ae9e8a6c00739383343160d97264792 square <admin@squarecode.de> 1742835360 +0100	commit: Refactor error handling using centralized ExceptionHandler.
+22c85d628ae9e8a6c00739383343160d97264792 cd8fa6e9d54006f805d6174f9b1218ed0f360f46 square <admin@squarecode.de> 1742835382 +0100	commit: Add support for tagFlag in ProxyCheckOptions
+b2cf7352d293cdb7c45ff6d00dc9b6447469583d 83b21457144a79e76baa98ca2bc9875344e06cc7 square <admin@squarecode.de> 1742846161 +0100	commit: Updating internals
+83b21457144a79e76baa98ca2bc9875344e06cc7 83b21457144a79e76baa98ca2bc9875344e06cc7 square <admin@squarecode.de> 1742846697 +0100	pull --no-rebase origin master: updating HEAD
+83b21457144a79e76baa98ca2bc9875344e06cc7 83b21457144a79e76baa98ca2bc9875344e06cc7 square <admin@squarecode.de> 1742846710 +0100	reset: moving to HEAD
+83b21457144a79e76baa98ca2bc9875344e06cc7 83b21457144a79e76baa98ca2bc9875344e06cc7 square <admin@squarecode.de> 1742846738 +0100	reset: moving to HEAD

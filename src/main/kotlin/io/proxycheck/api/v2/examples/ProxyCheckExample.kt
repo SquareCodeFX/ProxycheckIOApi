@@ -1,8 +1,8 @@
 package io.proxycheck.api.v2.examples
 
-import io.proxycheck.api.v2.ProxyCheckApiClient
+import io.proxycheck.api.v2.client.ProxyCheckApiClient
 import io.proxycheck.api.v2.models.ProxyCheckOptions
-import io.proxycheck.api.v2.models.QueryFlag
+import io.proxycheck.api.v2.models.flag.QueryFlag
 import kotlinx.coroutines.runBlocking
 
 /**
