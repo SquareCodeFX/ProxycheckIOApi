@@ -822,41 +822,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val proxyCheckResponse = gson.fromJson(responseBody, ProxyCheckResponse::class.java)
@@ -913,41 +880,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val proxyCheckResponse = gson.fromJson(responseBody, ProxyCheckResponse::class.java)
@@ -1006,41 +940,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val result = mutableMapOf<String, ProxyCheckResponse>()
@@ -1123,41 +1024,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val result = mutableMapOf<String, ProxyCheckResponse>()
@@ -1238,41 +1106,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val dashboardResponse = gson.fromJson(responseBody, DashboardResponse::class.java)
@@ -1329,41 +1164,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val dashboardResponse = gson.fromJson(responseBody, DashboardResponse::class.java)
@@ -1420,41 +1222,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val emailCheckResponse = gson.fromJson(responseBody, EmailCheckResponse::class.java)
@@ -1511,41 +1280,8 @@ class ProxyCheckApiClient(
                 val status = jsonObject.get("status").asString
                 val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when (status) {
-                    "error" -> {
-                        when {
-                            message.contains("API key") -> throw ApiKeyException(message)
-                            message.contains("rate limit") -> throw RateLimitException(message)
-                            message.contains("plan limit") || message.contains("query limit") -> {
-                                // Extract plan information if available
-                                if (jsonObject.has("plan")) {
-                                    val plan = jsonObject.get("plan").asString
-                                    val queriesToday = if (jsonObject.has("queries_today")) jsonObject.get("queries_today").asInt else null
-                                    val queriesMonth = if (jsonObject.has("queries_month")) jsonObject.get("queries_month").asInt else null
-                                    val maxQueriesDay = if (jsonObject.has("maxQueries_day")) jsonObject.get("maxQueries_day").asInt else null
-                                    val maxQueriesMonth = if (jsonObject.has("maxQueries_month")) jsonObject.get("maxQueries_month").asInt else null
-                                    val daysUntilReset = if (jsonObject.has("days_until_reset")) jsonObject.get("days_until_reset").asInt else null
-
-                                    throw PlanLimitException(
-                                        message,
-                                        null,
-                                        plan,
-                                        queriesToday,
-                                        queriesMonth,
-                                        maxQueriesDay,
-                                        maxQueriesMonth,
-                                        daysUntilReset
-                                    )
-                                } else {
-                                    throw PlanLimitException(message)
-                                }
-                            }
-                            else -> throw ApiErrorException(message)
-                        }
-                    }
-                    "warning" -> throw ApiWarningException(message)
-                    "denied" -> throw ApiDeniedException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val emailCheckResponse = gson.fromJson(responseBody, EmailCheckResponse::class.java)

@@ -333,14 +333,12 @@ class ProxyCheckApi(
             val jsonObject = JsonParser.parseString(responseBody).asJsonObject
 
             // Check for API errors
-            if (jsonObject.has("status") && jsonObject.get("status").asString == "error") {
-                val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown error"
+            if (jsonObject.has("status")) {
+                val status = jsonObject.get("status").asString
+                val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when {
-                    message.contains("API key") -> throw ApiKeyException(message)
-                    message.contains("rate limit") -> throw RateLimitException(message)
-                    else -> throw ApiErrorException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             return gson.fromJson(responseBody, ProxyCheckResponse::class.java)
@@ -369,14 +367,12 @@ class ProxyCheckApi(
             val jsonObject = JsonParser.parseString(responseBody).asJsonObject
 
             // Check for API errors
-            if (jsonObject.has("status") && jsonObject.get("status").asString == "error") {
-                val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown error"
+            if (jsonObject.has("status")) {
+                val status = jsonObject.get("status").asString
+                val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when {
-                    message.contains("API key") -> throw ApiKeyException(message)
-                    message.contains("rate limit") -> throw RateLimitException(message)
-                    else -> throw ApiErrorException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             val result = mutableMapOf<String, ProxyCheckResponse>()
@@ -430,14 +426,12 @@ class ProxyCheckApi(
             val jsonObject = JsonParser.parseString(responseBody).asJsonObject
 
             // Check for API errors
-            if (jsonObject.has("status") && jsonObject.get("status").asString == "error") {
-                val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown error"
+            if (jsonObject.has("status")) {
+                val status = jsonObject.get("status").asString
+                val message = if (jsonObject.has("message")) jsonObject.get("message").asString else "Unknown status: $status"
 
-                when {
-                    message.contains("API key") -> throw ApiKeyException(message)
-                    message.contains("rate limit") -> throw RateLimitException(message)
-                    else -> throw ApiErrorException(message)
-                }
+                // Use the ExceptionHandler to handle API errors
+                ExceptionHandler.handleApiError(status, message, jsonObject)
             }
 
             return gson.fromJson(responseBody, DashboardResponse::class.java)
