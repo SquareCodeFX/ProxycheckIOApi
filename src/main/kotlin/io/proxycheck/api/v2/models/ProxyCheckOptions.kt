@@ -1,5 +1,6 @@
 package io.proxycheck.api.v2.models
 
+import io.proxycheck.api.v2.models.flag.*
 import java.util.concurrent.TimeUnit
 
 /**

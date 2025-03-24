@@ -52,6 +52,11 @@ A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API
 - Check multiple IP addresses in a single request
 - Validate email addresses for disposable email providers
 - Get dashboard information about your ProxyCheck.io account
+- Export detection data from the dashboard API
+- Export tag data from the dashboard API
+- Export usage data from the dashboard API
+- Support for custom lists management
+- Support for CORS configuration
 - Support for all query flags and parameters
 - Proper error handling with custom exceptions
 - Rate limit handling
@@ -422,7 +427,7 @@ println("Time: ${emailResponse.time}")
 ### Getting Dashboard Information
 
 ```kotlin
-// Get dashboard information
+// Get basic dashboard information
 val dashboard = client.getDashboard()
 
 // Access the dashboard data
@@ -434,6 +439,153 @@ println("Queries Month: ${dashboard.queriesMonth}")
 println("Max Queries Day: ${dashboard.maxQueriesDay}")
 println("Max Queries Month: ${dashboard.maxQueriesMonth}")
 println("Days Until Reset: ${dashboard.daysUntilReset}")
+
+// Get dashboard with detection export data
+val options = ProxyCheckOptions.builder()
+    .flags(listOf(QueryFlag.EXPORT_DETECTIONS))
+    .build()
+val dashboardWithDetections = client.getDashboard(options)
+
+// Access detection export data
+if (dashboardWithDetections.detections != null) {
+    for ((ip, detection) in dashboardWithDetections.detections!!) {
+        println("IP: ${detection.ip}")
+        println("Date: ${detection.date}")
+        println("Proxy Type: ${detection.proxyType}")
+        println("Risk: ${detection.risk}")
+        println("Country: ${detection.country}")
+        println("ISO Code: ${detection.isoCode}")
+        println("ASN: ${detection.asn}")
+        println("Provider: ${detection.provider}")
+    }
+}
+
+// Get dashboard with usage export data
+val options = ProxyCheckOptions.builder()
+    .flags(listOf(QueryFlag.EXPORT_USAGE))
+    .build()
+val dashboardWithUsage = client.getDashboard(options)
+
+// Access usage export data
+if (dashboardWithUsage.usage != null) {
+    // Access daily usage
+    val dailyUsage = dashboardWithUsage.usage?.dailyUsage
+    if (dailyUsage != null) {
+        for ((date, usage) in dailyUsage) {
+            println("Date: $date")
+            println("Queries: ${usage.queries}")
+            println("Detections: ${usage.detections}")
+        }
+    }
+
+    // Access monthly usage
+    val monthlyUsage = dashboardWithUsage.usage?.monthlyUsage
+    if (monthlyUsage != null) {
+        for ((month, usage) in monthlyUsage) {
+            println("Month: $month")
+            println("Queries: ${usage.queries}")
+            println("Detections: ${usage.detections}")
+        }
+    }
+
+    // Access total usage
+    val totalUsage = dashboardWithUsage.usage?.totalUsage
+    if (totalUsage != null) {
+        println("Total Queries: ${totalUsage.queries}")
+        println("Total Detections: ${totalUsage.detections}")
+    }
+}
+
+// Get dashboard with custom lists
+val options = ProxyCheckOptions.builder()
+    .flags(listOf(QueryFlag.CUSTOM_LISTS))
+    .build()
+val dashboardWithLists = client.getDashboard(options)
+
+// Access custom lists
+if (dashboardWithLists.customLists != null) {
+    for (list in dashboardWithLists.customLists!!) {
+        println("List ID: ${list.id}")
+        println("List Name: ${list.name}")
+        println("List Description: ${list.description}")
+        println("List Type: ${list.type}")
+        println("Created At: ${list.createdAt}")
+        println("Updated At: ${list.updatedAt}")
+
+        // Access list entries
+        if (list.entries != null) {
+            for (entry in list.entries!!) {
+                println("Entry ID: ${entry.id}")
+                println("Entry Value: ${entry.value}")
+                println("Entry Note: ${entry.note}")
+                println("Added At: ${entry.addedAt}")
+            }
+        }
+    }
+}
+
+// Get dashboard with CORS configuration
+val options = ProxyCheckOptions.builder()
+    .flags(listOf(QueryFlag.CORS))
+    .build()
+val dashboardWithCors = client.getDashboard(options)
+
+// Access CORS configuration
+if (dashboardWithCors.corsStatus != null) {
+    println("CORS Enabled: ${dashboardWithCors.corsStatus?.enabled}")
+
+    // Access allowed origins
+    val allowedOrigins = dashboardWithCors.corsStatus?.allowedOrigins
+    if (allowedOrigins != null) {
+        println("Allowed Origins:")
+        for (origin in allowedOrigins) {
+            println("- $origin")
+        }
+    }
+
+    // Access allowed methods
+    val allowedMethods = dashboardWithCors.corsStatus?.allowedMethods
+    if (allowedMethods != null) {
+        println("Allowed Methods:")
+        for (method in allowedMethods) {
+            println("- $method")
+        }
+    }
+
+    // Access allowed headers
+    val allowedHeaders = dashboardWithCors.corsStatus?.allowedHeaders
+    if (allowedHeaders != null) {
+        println("Allowed Headers:")
+        for (header in allowedHeaders) {
+            println("- $header")
+        }
+    }
+
+    println("Allow Credentials: ${dashboardWithCors.corsStatus?.allowCredentials}")
+    println("Max Age: ${dashboardWithCors.corsStatus?.maxAge}")
+}
+
+// Get dashboard with tag export data
+val options = ProxyCheckOptions.builder()
+    .flags(listOf(QueryFlag.EXPORT_TAGS))
+    .build()
+val dashboardWithTags = client.getDashboard(options)
+
+// Access tag export data
+if (dashboardWithTags.tags != null) {
+    for ((tagName, tag) in dashboardWithTags.tags!!) {
+        println("Tag Name: ${tag.name}")
+        println("Count: ${tag.count}")
+        println("First Used: ${tag.firstUsed}")
+        println("Last Used: ${tag.lastUsed}")
+
+        // Access additional tag info
+        if (tag.info != null) {
+            println("Detections: ${tag.info?.get("detections")}")
+            println("Queries: ${tag.info?.get("queries")}")
+        }
+    }
+}
 ```
 
 ### Asynchronous API Usage

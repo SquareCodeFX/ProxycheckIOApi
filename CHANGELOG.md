@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rate limit handling
 - Caching support
 - Asynchronous API support using Kotlin Coroutines
+- Support for dashboard API detection exporting
+- Support for tag exporting
+- Support for usage exporting
+- Support for custom lists
+- Support for CORS configuration
 
 ### Changed
 - Introduced `ProxyCheckApiInterface` and adapter implementations (`ProxyCheckApiClientAdapter`, `ProxyCheckApiAdapter`) for better flexibility and testability
