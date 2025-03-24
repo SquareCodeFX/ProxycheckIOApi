@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added specific flag enums (`VpnFlag`, `AsnFlag`, `NodeFlag`, etc.) for more type-safe configuration
 - Updated examples to demonstrate the new API patterns and enum-based conditional logic
 - Improved documentation with more comprehensive examples
+- Refactored exception handling to reduce redundancy by introducing an `ExceptionHandler` utility class
 
 ### Deprecated
 - Direct use of boolean parameters in API methods (use `ProxyCheckOptions` instead)
