@@ -3,10 +3,13 @@ package io.proxycheck.api.v2.client
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.JsonParser.parseString
-import io.proxycheck.api.v2.exceptions.*
+import io.proxycheck.api.v2.exceptions.ApiErrorException
+import io.proxycheck.api.v2.exceptions.ApiKeyException
+import io.proxycheck.api.v2.exceptions.ExceptionHandler
+import io.proxycheck.api.v2.exceptions.NetworkException
+import io.proxycheck.api.v2.exceptions.ProxyCheckException
 import io.proxycheck.api.v2.models.ProxyCheckOptions
-import io.proxycheck.api.v2.models.flag.*
+import io.proxycheck.api.v2.models.flag.QueryFlag
 import io.proxycheck.api.v2.models.response.DashboardResponse
 import io.proxycheck.api.v2.models.response.ProxyCheckResponse
 import okhttp3.HttpUrl
