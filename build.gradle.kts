@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.SquareCodeFX"
-version = "1.0.0"
+version = "1.0.1"
 description = "A Java/Kotlin client library for the ProxyCheck.io API v2"
 
 repositories {
