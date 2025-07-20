@@ -70,7 +70,7 @@ A Java/Kotlin client library for the [ProxyCheck.io](https://proxycheck.io/) API
 
 ```kotlin
 dependencies {
-    implementation("com.github.SquareCodeFX:ProxycheckIOApi:1.0.1")
+    implementation("com.github.SquareCodeFX:ProxycheckIOApi:1.0.2")
 }
 ```
 
@@ -80,7 +80,7 @@ dependencies {
 <dependency>
     <groupId>com.github.SquareCodeFX</groupId>
     <artifactId>ProxycheckIOApi</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
