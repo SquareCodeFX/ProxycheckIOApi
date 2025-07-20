@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - YYYY-MM-DD
 
+- Update to version 1.0.1 with refactoring and new features
 - Update .gitignore to adjust gradle-wrapper.jar handling.
 - Remove ProxyCheckApiClientTest class.
 - Delete .git_old directory
@@ -16,4 +17,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update flags and add TagFlag support in documentation
 - Add support for tagFlag in ProxyCheckOptions
 - Refactor error handling using centralized ExceptionHandler.
-- Add ExceptionHandler for managing ProxyCheck API errors
